@@ -1,0 +1,234 @@
+* Lexical Analysis
+
+** Introduction
+
+The compiler has back-end and a front-end. The front-end part of the compiler does the analysis. The analysis done by the front-end are broken into three different parts:
+
+1. *Lexical analysis*: Break the input into individual words or "tokens"
+2. *Syntax analysis*: parsing the phrase structure of the program
+3. *Semantic analysis*: calculating the program's meaning
+
+** Lexical Token
+
+A lexical token is a sequence of character that can be considered as a unit in the programming language.
+The lexical analyser breaks the program into these tokens and ignores the things like spaces, comments etc. One of the reason for the lexical analyser to be different from the parser is to not complicate the parser to ignore things like spaces and comments etc.
+
+example:
+#+begin_src c
+int match0(int i)
+{ if (i == 0) return 0;
+}
+#+end_src
+
+Tokens in the abvoe program will be:
+
+/INT ID(match0) LPAREN INT ID(i) LBRACE IF LPAREN EQUALS INT(0) RPAREN RETURN INT(0) SEMICOLON RBRACE/
+
+
+We can see that some of the Token have semantic value attached to it, like the INT and Identifier. It contains a value along with the TokenType to give it more meaning.
+
+
+** Regular language
+
+- A language is a set of string. A legal Haskell Program is the set of all strings that constitute legal Haskell program
+
+  [[file:fig1.png]]
+
+  - Lexical specification should always be complete. It should always match string to some parts of the specifications. We can easily do this by matching an "Illegal character" error message and continue
+  - the rules described above is quite ambigious, if8 -> can match either one token or a two "if" and "8". These kind of ambiguities are not preferable in the language specification
+  - In order to resolve this, we generally use two important rules:
+    1. Longest match: The longest initial substring of the input that can match any regular expression is taken as the next token.
+    2. Rule Priority: For a "particular longest match", the first regex to match will be the TokenType. This means that the order in which we write the rules of the regex match is very important and determines the priority.
+
+** Finite Automata
+
+ - Regular expressions are very convinient for specifying lexical tokens but we need some formalism so that these can be implemented by a computer through a mechanical process.
+ - Finite automata have a finite set of states and the transition between them through consuming a character
+ - All finite automata have a set of final states and non-final states. The final states are the ones where the TokenType are specified and are matched.
+ - It has ONE start state
+ - Finite Automata are of two types:-
+
+   a. *Deterministic Finite Automata*
+      - No two edges leaving from the same state have the same label. This means that from a given state s1, every state change
+        is linked with consuming a certain character.
+      - If by n-transitions for an n-character string, if the automation is in a final state, then it accepts the string. If it is not in the final state, or if at some point there was no appropriately labeled edge to follow, it rejects. The language recognized by an automaton is the set of strings that it accepts.
+      - We can represent if using a vector with row label as set of characters in the alphabet and column label as the state numbers
+ #+begin_src text
+    Input →   0   1   2  ...  e   f   g   h
+States ↓
+State 0     [ 0,  1,  0, ... 0,  2,  3,  4 ]
+State 1     [ 1,  1,  0, ... 0,  0,  1,  2 ]
+State 2     [ 0,  2,  2, ... 1,  0,  0,  0 ]
+...
+ #+end_src
+
+Note: Refer to page number 33 for more information regarding this
+
+a. *Non-Deterministic Finite Automata*
+   - An NDA is the one which has a choice of edges labeled with the same edges
+   - It also has a episilon move. This allowes the automaton to transition the state without consuming a character.
+   - The machine has to guess and must always guess correctly to reach the final state
+
+Note: For conversion and more information refer to /page 34/ for Tiger book
+
+
+** ε-Closure in NFA
+
+*** What is ε-closure
+
+The ε-closure of a set of states `S` in a Nondeterministic Finite Automaton (NFA) is the set of all states that can be reached from any state in `S` by following only ε-transitions (transitions that consume no input).
+
+*** Mathematical Definitio
+
+The ε-closure of `S`, denoted `closure(S)`, is the smallest set `T` such that:
+
+\( T = S \cup \left( \bigcup_{s \in T} \text{edge}(s, \epsilon) \right) \)
+
+
+This means:
+- Start with `S`.
+- Add all states reachable from `S` by ε-transitions.
+- Keep repeating this for newly added states.
+- Stop when no more new states can be added.
+
+*** Iterative Algorithm to Compute ε-closur
+
+#+BEGIN_SRC text
+T ← S
+repeat
+    T' ← T
+    T ← T' ∪ (⋃ edge(s, ε) for s in T')
+until T = T'
+#+END_SRC
+
+*** Step-by-step Explanatio
+
+1. Start with the initial set `T = S`.
+2. Save the current state of `T` in `T'`.
+3. For every state `s` in `T'`, find all ε-transitions `edge(s, ε)`.
+4. Add the results to `T`.
+5. Repeat until `T` does not change between steps (i.e., `T = T'`).
+
+*** Why This Works
+
+- `T` can only grow with each iteration.
+- Since there is a finite number of states in the NFA, the process must stop.
+- When `T` stops changing, we have found all states reachable via ε-transitions from the original set `S`.
+
+*** Summary
+
+- ε-closure finds all states reachable by ε-moves.
+- Uses a growing set approach with union over transitions.
+- Terminates due to the finite nature of NFA states.
+
+** Simulating an NFA Using Sets of States
+
+*** Goal
+
+We want to simulate an NFA on an input string by tracking the set of states the machine could be in after reading each symbol.
+
+*** Definitions
+
+Suppose we are in a set of NFA states:
+
+\( d = \{s_i, s_k, s_l\} \)
+
+
+If we read an input symbol `c`, the new set of states we can move to is defined as:
+
+\( \text{DFAedge}(d, c) = \text{closure}\left( \bigcup_{s \in d} \text{edge}(s, c) \right) \)
+
+
+*** Interpretation
+
+- `edge(s, c)`: the set of states reachable from state `s` by consuming symbol `c`.
+- Take the union of all such transitions for all states `s` in `d`.
+- Apply ε-closure to the resulting set to include any states reachable by ε-transitions.
+
+Thus, `DFAedge(d, c)` represents the new set of possible states after consuming `c`.
+
+*** Simulation Algorithm
+
+Given:
+- Start state is \( s_1 \)
+- Input string is \( c_1, c_2, \dots, c_k \)
+
+The algorithm is:
+
+#+BEGIN_SRC text
+d ← closure({s1})
+for i ← 1 to k:
+    d ← DFAedge(d, ci)
+#+END_SRC
+
+*** Why This Works
+
+- NFAs can be in multiple states simultaneously.
+- For each input symbol:
+  - Compute all possible transitions (`edge(s, c)`).
+  - Include ε-transitions (via `closure`).
+- After processing the entire input string, `d` will be the set of all states the NFA could be in.
+
+The DFA Calculation for each of the symbol is a very expensive process so we do the calculations in advance for the set of steps of DFA. For "n" states, the max states a DFA can have is 2^n.
+
+*** Subset Construction Algorithm (DFA construction)
+
+This constructs the DFA from the NFA:
+
+#+BEGIN_SRC pseudo
+states[0] ← closure({s1})
+p ← 0
+j ← 0
+while j ≤ p
+  for each c ∈ Σ
+    e ← DFAedge(states[j], c)
+    if e = states[i] for some i ≤ p
+      trans[j, c] ← i
+    else
+      p ← p + 1
+      states[p] ← e
+      trans[j, c] ← p
+  j ← j + 1
+#+END_SRC
+
+*** Explanation
+
+1. Initialize the first state of the DFA:
+   - states[0] ← closure({s1})
+
+2. Initialize the variables:
+   - p ← 0 (last DFA state index)
+   - j ← 0 (current state index)
+
+3. While j ≤ p (continue while there are states to process):
+   1. For each symbol c ∈ Σ (input alphabet):
+      1. Compute DFAedge(states[j], c) to find the set of states e.
+      2. If e corresponds to an existing DFA state:
+         - Find i ≤ p such that e = states[i]
+         - Set trans[j, c] ← i (transition from state j on input c goes to state i)
+      3. Otherwise, create a new state:
+         - Increment p: p ← p + 1
+         - Add e as a new state: states[p] ← e
+         - Set trans[j, c] ← p (transition from state j on input c goes to new state p)
+   2. Increment j: j ← j + 1
+
+4. Repeat steps until all states are processed.
+
+
+*** Important Points
+
+- Avoids generating unreachable states.
+- Only explores reachable subsets of NFA states.
+- Avoids exponential blowup in practice (even though worst case is 2ⁿ states).
+
+*** Final State Recognition
+
+A DFA state is marked as *final* if **any** of the NFA states inside it are final.
+
+In lexical analyzers:
+- Each final DFA state is associated with a *token type*.
+- If multiple NFA final states exist in a DFA state, use the first-match priority to resolve.
+
+*** DFA Final State Token Labeling
+If DFA state `d` contains several NFA final states:
+- Label `d` with the token-type that occurred first in the original list (based on rule priority).

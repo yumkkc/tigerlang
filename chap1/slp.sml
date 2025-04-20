@@ -103,3 +103,6 @@ and interpExp (exp_x: exp, table: (string * int) list) =
 							  
 fun interp (expr: stm) =
     (interpStm(expr, []); ())
+
+
+interp prog
