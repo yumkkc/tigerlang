@@ -232,3 +232,33 @@ In lexical analyzers:
 *** DFA Final State Token Labeling
 If DFA state `d` contains several NFA final states:
 - Label `d` with the token-type that occurred first in the original list (based on rule priority).
+
+** IMPORTANT POINTS FOR THE IMPLEMENTATION OF TIGER (LEXER)
+
+- The reserved words of the language are:
+  #+begin_src text
+  while, for, to, break, let, in, end, function, var, type, array, if, then, else, do, of, nil.
+  #+end_src
+
+- The punctuation syms. used in the language are:
+  #+begin_src text
+  , : ; ( ) [ ] {  } . + - * / = <> < <= > >= & | :=
+  #+end_src
+
+*** Language points
+
+1. /identifier/ is a sequence of letters, digits and underscores, starting with a letter
+2. /Comments/ may appear any two tokens between /* */. They can be nested
+3. Variables are declared with "var" and functions are declared with "function".
+4. Equals is ":="
+5. type declaration syntax is : "type" "identifier" = ty
+6. two built-in types are "int" and "string"
+7. "for" and "while" loop
+8. "String" is between quotes("), of zero or more printable characters, spaces or escape sequences. Each escape sequence is introduced by the escape character \, and stands for a character sequence. The allowed ones are:
+   1. \n
+   2. \t
+   3. \^c
+   4. \ddd
+   5. \"
+   6. \\
+   7. \f____f\. This sequence is ignored, where f____f stands for a sequence of one or more formatting characters. This allows one to write long strings on more than one line, by writing \ at the end of one line and at the start of the next.

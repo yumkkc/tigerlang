@@ -3,6 +3,7 @@ sig
     type linenum
     type token
     val NUM: (string) * linenum * linenum -> token
+    val STRING: (string) * linenum * linenum -> token
     val LBRACK: linenum * linenum -> token
     val RBRACK: linenum * linenum -> token
     val PLUS: linenum * linenum -> token
