@@ -9,35 +9,14 @@ fun eof() = let val pos = hd(!linePos) in Tokens.EOF(pos,pos) end
 
 fun to_int v = List.foldl (fn (a, b) => ord(a) - ord(#"0") + b*10) 0 (explode v);
 
-val curr_string = ref ""
-val curr_str_start_pos = ref 0
-val curr_str_end_pos = ref 0
-
-fun start_string v = curr_str_start_pos := v
-
-fun end_string v = curr_str_end_pos := v
-
-fun current_string v  = curr_string := !curr_string ^ v
-
-fun get_string () =
-    let
-        val s = !curr_string;
-    in
-        curr_string := "";
-        (s, !curr_str_start_pos, !curr_str_end_pos)
-    end
-
-
 
 %%
 %structure Mlex
 %s COMMENT;
-%s STRING;
-%s STRING_ESC;
 alpha=[A-Za-z];
 digit=[0-9];
 alphanumeric=[A-Za-z0-9];
-stringchar=[ A-Za-z0-9];
+space=[\ \t];
 %%
 
 <INITIAL>"var" => (Tokens.VAR(yypos, yypos + String.size yytext));
@@ -78,25 +57,21 @@ stringchar=[ A-Za-z0-9];
 <INITIAL>";" => (Tokens.SEMICOLON(yypos, yypos + String.size yytext));
 <INITIAL>":" => (Tokens.COLON(yypos, yypos + String.size yytext));
 <INITIAL>"," => (Tokens.COMMA(yypos, yypos + String.size yytext));
-<INITIAL>"/*" => (YYBEGIN COMMENT; continue());
-<COMMENT>"*/" => (YYBEGIN INITIAL; continue());
-<COMMENT>. => (continue());
-<INITIAL>"\"" => (YYBEGIN STRING; start_string yypos; continue());
-<INITIAL>[\s\n\t\b] => (continue());
-<COMMENT>[\s\n\t\b] => (continue());
-<INITIAL>" " => (continue());
-<STRING>"\"" => (YYBEGIN INITIAL; end_string yypos; Tokens.STRING(get_string()));
 
-<STRING>({stringchar} | " ")* => (current_string yytext; continue());
-<STRING>"\\" => (YYBEGIN STRING_ESC; continue());
+<INITIAL>["][^"]*["] => (Tokens.STRING(yytext, yypos, yypos + size yytext));
 
-<STRING_ESC>[nt] => (current_string ("\\"^yytext); YYBEGIN STRING; continue());
-<STRING_ESC>"\^"{alpha} => (current_string ("\\^"^yytext); YYBEGIN STRING; continue());
-<STRING_ESC>{digit}{3} => (current_string ("\\"^yytext); YYBEGIN STRING; continue());
 
 
 <INITIAL>{digit}+ => (Tokens.INT(to_int(yytext), yypos, yypos+String.size yytext));
 <INITIAL>{alpha}+({alphanumeric}|"_")* => (Tokens.ID(yytext, yypos, yypos+String.size yytext));
 
+<INITIAL>"/*" => (YYBEGIN COMMENT; continue());
+<COMMENT>"*/" => (YYBEGIN INITIAL; continue());
+<COMMENT>. => (continue());
+
+<INITIAL>{space}+ => (continue());
+"\n" => (lineNum := !lineNum+1; linePos := yypos :: !linePos; continue());
+
+<INITIAL>["][^"]* => (ErrorMsg.error yypos ("Unterminated string " ^ yytext); continue());
 .       => (ErrorMsg.error yypos ("illegal character " ^ yytext); continue());
 

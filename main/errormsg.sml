@@ -34,14 +34,15 @@ struct
 				       Int.toString n,
 				       ".",
 				       Int.toString (pos-a)]
-		       else look(rest,n-1)
+		else look(rest,n-1)
 	    | look _ = print "0.0"
-       in anyErrors := true;
-	  print (!fileName);
-	  look(!linePos,!lineNum);
-	  print ":";
-	  print msg;
-	  print "\n"
+       in
+           anyErrors := true;
+	       print (!fileName);
+	       look(!linePos,!lineNum);
+	       print ":";
+	       print msg;
+	       print "\n"
       end
 
   fun impossible msg =

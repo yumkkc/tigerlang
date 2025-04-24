@@ -262,3 +262,15 @@ If DFA state `d` contains several NFA final states:
    5. \"
    6. \\
    7. \f____f\. This sequence is ignored, where f____f stands for a sequence of one or more formatting characters. This allows one to write long strings on more than one line, by writing \ at the end of one line and at the start of the next.
+
+
+
+<INITIAL>"\"" => (YYBEGIN STRING; start_string yypos; continue());
+<STRING>"\"" => (YYBEGIN INITIAL; end_string yypos; Tokens.STRING(get_string()));
+
+<STRING>({stringchar} | " ")* => (current_string yytext; continue());
+<STRING>"\\" => (YYBEGIN STRING_ESC; continue());
+
+<STRING_ESC>[nt] => (current_string ("\\"^yytext); YYBEGIN STRING; continue());
+<STRING_ESC>"\^"{alpha} => (current_string ("\\^"^yytext); YYBEGIN STRING; continue());
+<STRING_ESC>{digit}{3} => (current_string ("\\"^yytext); YYBEGIN STRING; continue());
