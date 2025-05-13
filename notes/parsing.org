@@ -1,0 +1,412 @@
+#+title: Parsing
+#+author: yum
+
+* Parsing
+
+
+** 1. Regular Expressions and Abbreviation in ML-Lex
+
+ML-Lex is a tool for generating lexical analyzers, and it allows **abbreviations** for regular expressions, enabling you to define symbols like:
+
+#+begin_src text
+digits = [0-9]+
+sum = (digits "+" )* digits
+#+end_src
+
+This defines a **sum** as a sequence of one or more numbers separated by plus signs (e.g., `28+301+9`). This is simple and effective for flat, left-to-right patterns.
+
+** 2. Introducing Nesting and Its Challenge
+
+Things get complicated when we want to allow **nested arithmetic expressions** such as:
+
+#+begin_example text
+(109+23)
+(1+(250+3))
+#+end_example
+
+This requires a new structure:
+
+#+begin_src text
+digits = [0-9]+
+sum = expr "+" expr
+expr = "(" sum ")" | digits
+#+end_src
+
+Now `sum` and `expr` are **mutually recursive**:
+- `sum` uses `expr`
+- `expr` may contain `sum`
+
+**The problem:** This goes **beyond regular expressions**.
+
+Why? Because **regular expressions can be converted into finite automata**, which:
+- Have **finite memory** (N states)
+- Cannot count or track **nested structures**, such as matching `(` with `)`.
+
+This means regular expressions **cannot recognize balanced parentheses** — a key limitation.
+
+** 3. Substitution Breakdown and Recursion
+
+ML-Lex allows **simple substitutions** like:
+
+#+begin_src
+sum = (digits "+" )* digits
+#+end_src
+
+This works because `digits` is a **flat expression**.
+
+But when `sum` and `expr` are mutually recursive, things fall apart:
+
+#+begin_src
+expr = "(" expr "+" expr ")" | digits
+#+end_src
+
+If you try to substitute `expr` into itself recursively, the size of the expression explodes and doesn’t resolve. It’s **not finitely representable**, which violates the principle of regular expressions.
+
+This is why such constructs cannot be expressed using **regular expressions** alone.
+
+** 4. What Adds Expressive Power? Recursion
+
+The key to increasing expressive power is **recursion**, not abbreviations.
+
+Recursion allows us to define constructs like:
+
+#+begin_src
+expr = "(" expr "+" expr ")" | digits
+#+end_src
+
+Which is necessary for parsing **hierarchical** or **nested** structures, such as:
+- Parenthesized math
+- Programming language statements
+- Function calls
+
+**Regular expressions cannot do this.**
+
+** 5. Avoiding Alternation and Kleene Star Using Recursion
+
+Recursion can replace both **alternation (`|`)** and **Kleene star (`*`)**.
+
+Example:
+#+begin_src
+expr = ab(c | d)e
+#+end_src
+
+Can be rewritten as:
+#+begin_src
+aux = c
+aux = d
+expr = a b aux e
+#+end_src
+
+And Kleene closure:
+#+begin_src
+expr = (a b c)*
+#+end_src
+
+Can be rewritten using recursion:
+#+begin_src
+expr = (a b c) expr
+expr = ε
+#+end_src
+
+This shows that **recursion can encode repetition and choice**, meaning grammars don’t need special syntax for these features.
+
+** 6. Transition to Context-Free Grammars (CFGs)
+
+
+The limitations of regular expressions lead us to a more powerful formalism: **context-free grammars (CFGs)**.
+
+*** Grammar 3.1: Syntax for Straight-Line Programs
+
+#+begin_src
+S → S ; S
+S → id := E
+S → print ( L )
+E → id | num | E + E | ( S , E )
+L → E | L , E
+#+end_src
+
+This grammar describes simple programming constructs:
+- Sequences of statements
+- Assignments
+- Function-like expressions (`print(L)`)
+- Arithmetic expressions
+- Lists
+
+This is **declarative**: we describe the form of valid programs without saying how to parse them step-by-step.
+
+CFGs can:
+- Represent **recursive** structures
+- Handle **nesting**
+- Allow parsing of real programming languages
+
+** 7. Why Use CFGs?
+
+- Regular expressions are sufficient for lexical structure (tokens).
+- CFGs are necessary for **syntax structure** (e.g., expressions, statements).
+- ML-Lex handles lexical rules, but for **full language parsing**, you need a parser generator like ML-Yacc, which handles CFGs.
+
+** 8. Summary
+- Abbreviations in ML-Lex are convenient but **don’t make regex more powerful** unless used recursively.
+- **Balanced parentheses and nesting** require recursive definitions and CFGs.
+- CFGs are crucial for parsing languages with complex syntax, and are more expressive than regular expressions.
+
+
+* Content-Free Grammers
+
+- For a parser, the alphabet is the set of token types returned by the lexical analyzer
+- cfg describes a language and has a set of productions of the form
+
+  #+begin_src text
+symbol -> symbol symbol ..... symbol
+  #+end_src
+
+- The RHS can have zero or more symbols
+- The symbol can either be *terminal*, which means that it is a character from the lexical alphabet or a *non-terminal* which means that these appear in the LHS of the some production.
+- One of the non-terminals is distinguished as the start symbol of the grammer
+
+
+** Derivations
+
+- The grammer can have either leftmost derivation or rightmost derivation
+- This just means "which" side's non-terminal symbol is consumed first.
+-  A leftmost derivation is one inw which the left most non-terminal symbol is always the one expanded. This is the opposite of rightmost derivation.
+
+** Parse Tree
+
+A parse tree is made from connecting each symbol in a derivation to the one from which it was derived. Two derivations can have the same parse tree.
+
+#+BEGIN_SRC text
+S
+├── S
+│   ├── id
+│   ├── :=
+│   └── E
+│       └── num
+├── ;
+└── S
+    ├── id
+    ├── :=
+    └── E
+        ├── E
+        │   └── id
+        ├── +
+        └── E
+            ├── (
+            ├── S
+            │   ├── id
+            │   ├── :=
+            │   └── E
+            │       ├── E
+            │       │   └── num
+            │       ├── +
+            │       └── E
+            │           └── num
+            ├── ,
+            ├── E
+            │   └── id
+            └── )
+#+END_SRC
+
+
+*** Ambigious Grammer
+ - Grammer is ambigious if the sentence can be derived from the different parse trees
+ #+begin_src
+E -> id
+E -> num
+E -> E * E
+E -> E / E
+E -> E + E
+E -> E - E
+E -> (E)
+#+end_src
+
+The grammer above is ambiguous. Take a sentence, 1-2-3. This can be derived with
+
+#+BEGIN_SRC text
+E
+├── E
+│   ├── E
+│   │   └── 1
+│   ├── -
+│   └── E
+│       └── 2
+├── -
+└── E
+    └── 3
+
+======================================================================
+
+E
+├── E
+│   └── 1
+├── -
+└── E
+    ├── E
+    │   └── 2
+    ├── -
+    └── E
+        └── 3
+#+END_SRC
+
+This would result in two different meaning for the same statement
+- (1 - 2) - 3 AND 1 - (2 - 3)
+- For every non-associative operations like subtraction, this is bad
+- Compilers use these parse tree to derive the meaning
+
+** Predictive Parsing
+
+- Some grammers are easy to parse using a simple algorithm called "Recursive descent parsing"
+- This type of parser has one function for each non-terminal and one clause for each production
+- This parser requires a /grammer/ where the first terminal symbol of each sub-expression provides enough information to choose
+  which production to use.
+
+** FIRST AND FOLLOW SETS
+
+- FIRST just mean "What could possibly be the first thing I see?"
+- First(s) means the set of all terminal symbols that can begin any string derived from s
+- y = T * F. We need to look at what T can start with. If T can make something like id, num or ( then
+  FIRST(T * F) = {id, num, (}
+
+
+
+**** Algorithm
+In the algorithm,
+- FOLLOW => i+1 to j-1 is checking if from i+1 to j-1 everything can be nulled. If thats the case
+  what follows immediately from i can be j so we append FOLLOW[Yi] = FOLLOW[yi] U FIRST[Yj]
+
+  * FIRST and FOLLOW Sets in Context-Free Grammars
+
+*** nullable(X)
+A nonterminal X is nullable if it can derive the empty string (ε).
+
+*** FIRST(γ)
+The FIRST set of a string γ of terminals and nonterminals is the set of terminals that can appear at the beginning of any string derived from γ.
+
+*** FOLLOW(X)
+The FOLLOW set of a nonterminal X is the set of terminals that can appear immediately to the right of X in some derivation.
+
+** Key Concepts and Rules
+
+*** Computing nullable
+For each production:
+- If X → Y₁ Y₂ ... Yₖ
+- If all Y₁ ... Yₖ are nullable (or k = 0), then nullable[X] = true
+
+*** Computing FIRST
+For each terminal symbol Z:
+- FIRST[Z] = {Z}
+
+For each production X → Y₁ Y₂ ... Yₖ:
+- For each i from 1 to k:
+  - If Y₁...Yᵢ₋₁ are all nullable, then:
+    - FIRST[X] = FIRST[X] ∪ FIRST[Yᵢ]
+
+*** Computing FOLLOW
+Let S be the start symbol. Add $ (end-of-input marker) to FOLLOW[S].
+
+For each production X → Y₁ Y₂ ... Yₖ:
+- For i from 1 to k, for j from i+1 to k:
+  - If Yᵢ₊₁ ... Yⱼ₋₁ are all nullable:
+    - FOLLOW[Yᵢ] = FOLLOW[Yᵢ] ∪ FIRST[Yⱼ]
+- If Yᵢ₊₁ ... Yₖ are all nullable:
+  - FOLLOW[Yᵢ] = FOLLOW[Yᵢ] ∪ FOLLOW[X]
+
+** Example: S → A B C D
+
+Let’s define Y₁ = A, Y₂ = B, Y₃ = C, Y₄ = D
+
+We apply the rule:
+If Yᵢ₊₁ ... Yⱼ₋₁ are nullable, then FOLLOW[Yᵢ] = FOLLOW[Yᵢ] ∪ FIRST[Yⱼ]
+
+Assuming B and C are nullable:
+
+- FOLLOW[A] = FOLLOW[A] ∪ FIRST[B] ∪ FIRST[C] ∪ FIRST[D]
+- FOLLOW[B] = FOLLOW[B] ∪ FIRST[C] ∪ FIRST[D]
+- FOLLOW[C] = FOLLOW[C] ∪ FIRST[D]
+
+** Purpose of i+1 to j-1 Rule
+
+This rule helps us determine:
+- What symbols might follow a nonterminal in a production
+- Even if there are symbols in between, they might be nullable
+- So, the later symbol can effectively come right after the earlier one
+
+It's essential for accurate FOLLOW set calculation and LL(1) parsing table generation.
+
+** Summary
+
+- nullable(X): Can X derive ε?
+- FIRST(γ): What terminals can start strings from γ?
+- FOLLOW(X): What terminals can appear right after X?
+- Rule (i+1 to j−1): Helps FOLLOW by skipping nullable symbols between positions.
+
+
+** The other important Algorithm (from compilerAi youtube: https://www.youtube.com/watch?v=Qgn3DBCAVHM)
+
+1. For each production A → α X β:
+   - FIRST(β) − {ε} ⊆ FOLLOW(X)
+
+2. For each production A → α X β:
+   - If ε ∈ FIRST(β) or β is empty:
+     - FOLLOW(A) ⊆ FOLLOW(X)
+
+*** Construction a predcitive parser
+- A parser table contains non-terminal and terminal in row and column respectively
+- For a production, \(X -> \gamma \). In Row X and column T of the table, put that production rule in the column T if
+  \( T \in \text{FIRST}(\gamma) \)
+- Also, if \(\gamma \) is nullable, enter the production in row X, column T for each \(T \in FOLLOW(\gamma) \)
+- The grammer whose predictive parsing table contain no duplicate entries are LL(1). This stands for Left-to-right parse, Leftmost-derivation, l-symbol lookahead.
+
+
+*** LR PARSING
+
+
+** Grammar:
+
+#+begin_src yacc
+E → E + E
+E → E - E
+E → E * E
+E → INT
+#+end_src
+
+** Precedence and Associativity:
+
+- `*` has higher precedence than `+` and `-`.
+- `+` and `-` have same precedence, left-associative.
+
+** Parsing Actions:
+
+
+| Stack     | Input         | Action                                |
+|-----------+---------------+---------------------------------------|
+| (empty)   | 8 - 6 * 6 + 8 | shift 8                               |
+| 8         | - 6 * 6 + 8   | reduce 8 → E                          |
+| E         | - 6 * 6 + 8   | shift -                               |
+| E -       | 6 * 6 + 8     | shift 6                               |
+| E - 6     | * 6 + 8       | reduce 6 → E                          |
+| E - E     | * 6 + 8       | shift *                               |
+| E - E *   | 6 + 8         | shift 6                               |
+| E - E * 6 | + 8           | reduce 6 → E                          |
+| E - E * E | + 8           | reduce E * E → E (higher precedence)  |
+| E - E     | + 8           | reduce E - E → E (left associativity) |
+| E         | + 8           | shift +                               |
+| E +       | 8             | shift 8                               |
+| E + 8     | (empty)       | reduce 8 → E                          |
+| E + E     | (empty)       | reduce E + E → E                      |
+| E         | (empty)       | accept                                |
+
+** Summary:
+
+- Shift integers, then reduce them to `E`.
+- When encountering operators:
+  - If higher precedence: shift more.
+  - If equal precedence and left-associative: reduce first.
+
+** Important Observations:
+
+- `*` binds more tightly, so `6 * 6` is grouped first.
+- `-` and `+` are evaluated left to right.
+
+** Final parse:
+((8 - (6 * 6)) + 8)

@@ -1,0 +1,265 @@
+#+title: Ml Yacc
+
+- ML consists of three parts seperated by %%
+
+  #+begin_src text
+{user declarations}
+%%
+{ML-Yacc declarations}
+%%
+{rules}
+ #+end_src
+
+*** user declarations*:
+The values that are going to be used in the semantic actions of the "rules" can be declared here. It is usually recommended to keep this as small as possible.
+
+*** ML-Yacc declarations :
+- required Declarations and optional declarations.
+- set of non terminals and terminals to be declared here
+- predences for the terminals should be made
+- declarations that will improve error-recovery, and suppress the generation of default reductions in the parser.
+
+*** rules
+- sections contains the cfg productions and their associated semantic actions
+
+
+
+** ML-Yacc Lexical Definitions
+
+The lexical definitions specify how ML-Yacc tokenizes and interprets the text in a specification file, which consists of three sections: *user declarations*, *ML-Yacc declarations*, and *rules*, separated by `%%` delimiters. This section explains comments, reserved words, ML symbols, and non-ML symbols used in the specification.
+
+** Comments
+- Comments follow the syntax of *Standard ML (SML)*, using `(* comment text *)`.
+- They can be **nested** and placed **anywhere** in the specification (user declarations, ML-Yacc declarations, or rules).
+- Comments are **ignored** by ML-Yacc during parsing.
+#+BEGIN_SRC sml
+  (* This is a comment *)
+  (* Nested (* comment *) *)
+#+END_SRC
+
+**
+
+** Delimiting Sections with `%%`
+- The `%%` symbol is a **delimiter** that separates the three sections of the ML-Yacc specification.
+- **Behavior**:
+  - All text (excluding comments) up to the *first* `%%` is the *user declarations section*.
+  - Text between the first and second `%%` is the *ML-Yacc declarations section*.
+  - Text after the second `%%` is the *rules section*.
+
+- **Note**: `%%` must appear *outside* comments to be recognized as a delimiter.
+#+BEGIN_SRC sml
+  (* User declarations *)
+  fun add(x, y) = x + y
+  %%
+  (* ML-Yacc declarations *)
+  %term NUM | PLUS
+  %nonterm expr
+  %%
+  (* Rules *)
+  expr : NUM PLUS NUM { add($1, $3) }
+#+END_SRC
+
+** Reserved Words and Symbols
+
+In the *ML-Yacc declarations* and *rules* sections (after the first `%%`), the following words and symbols are **reserved** and cannot be used as identifiers.
+
+*** Reserved Words
+- `of`
+- `for`
+
+*** Reserved Symbols
+- `=`
+- `{`
+- `}`
+- `,`
+- `*`
+- `->`
+- `:`
+- `|`
+- `(`
+- `)`
+
+*** Purpose
+- Used in ML-Yacc syntax, e.g.:
+  - `of`: Specifies types (e.g., `%nonterm expr of int`).
+  - `->`: Used in grammar rules (e.g., `expr -> NUM PLUS NUM`).
+  - `{ }`: Enclose semantic actions (e.g., `{ $$ = $1 + $3 }`).
+  - `|`: Separates alternative productions (e.g., `expr : NUM | NUM PLUS NUM`).
+#+BEGIN_QUOTE
+These cannot be used as names for terminals or nonterminals (e.g., you cannot name a terminal `of` or `=`).
+#+END_QUOTE
+
+** ML Symbols
+ML-Yacc uses lexical classes that follow *Standard ML (SML)* conventions for naming terminals, nonterminals, and other entities.
+
+*** Identifiers
+- **Definition**: Nonsymbolic SML identifiers:
+  - Start with an *alphabetic character* (a–z, A–Z).
+  - Followed by zero or more:
+    - Alphabetic characters (a–z, A–Z).
+    - Numeric characters (0–9).
+    - Primes (`'`).
+    - Underscores (`_`).
+- **Examples**:
+  - `expr`
+  - `NUM`
+  - `my_rule2`
+  - `term'`
+  - `abc_123`
+- **Invalid Examples**:
+  - `2abc` (starts with a number).
+  - `_abc` (starts with an underscore).
+- **Usage**: Names for terminals (e.g., `%term NUM`), nonterminals (e.g., `%nonterm expr`), etc.
+
+*** Type Variables
+- **Definition**: Nonsymbolic SML identifier starting with a *prime* (`'`).
+- **Examples**:
+  - `'a`
+  - `'type`
+  - `'abc_123`
+- **Usage**: Used in type declarations for polymorphic types (e.g., `%nonterm expr of 'a list`).
+#+BEGIN_SRC sml
+  %nonterm expr of 'a list
+#+END_SRC
+
+*** Integers
+- **Definition**: One or more *decimal digits* (0–9).
+- **Examples**:
+  - `123`
+  - `0`
+  - `42`
+- **Invalid Examples**:
+  - `12.34` (contains a decimal point).
+  - `abc` (not digits).
+- **Usage**: Used in declarations like precedence levels (e.g., `%left PLUS 10`) or in semantic actions.
+
+*** Qualified Identifiers
+- **Definition**: An identifier followed by a *period* (`.`).
+- **Examples**:
+  - `List.map`
+  - `MyModule.func`
+- **Usage**: Refer to names in SML modules or structures, often in user declarations or semantic actions.
+#+BEGIN_SRC sml
+  structure Math = MyMath
+  %%
+  %term NUM
+  %nonterm expr of int
+  %%
+  expr : NUM { Math.add($1, 0) }
+#+END_SRC
+
+** Non-ML Symbols
+ML-Yacc defines lexical classes specific to its syntax, not part of Standard ML.
+
+*** % Identifiers
+- **Definition**: A *percent sign* (`%`) followed by one or more *lowercase alphabetic letters* (a–z).
+- **Valid % Identifiers**:
+  - `%arg`
+  - `%eop`
+  - `%header`
+  - `%keyword`
+  - `%left`
+  - `%name`
+  - `%nodefault`
+  - `%nonassoc`
+  - `%nonterm`
+  - `%noshift`
+  - `%pos`
+  - `%prec`
+  - `%prefer`
+  - `%pure`
+  - `%right`
+  - `%start  - `%start`
+  - `%subst`
+  - `%term`
+  - `%value`
+  - `%verbose`
+- **Purpose**: Keywords for configuring the parser in the *ML-Yacc declarations* section, e.g.:
+  - `%term`: Declares terminals.
+  - `%nonterm`: Declares nonterminals.
+  - `%start`: Specifies the start symbol.
+  - `%pure`: Declares side-effect-free semantic actions.
+#+BEGIN_SRC sml
+  %term NUM | PLUS
+  %nonterm expr of int
+  %start expr
+  %left PLUS
+#+END_QUOTE
+
+Only these % identifiers are valid, and they are case-sensitive (lowercase only).
+
+*** Code
+- **Definition**:
+  - A block of *Standard ML code* enclosed in *parentheses* (`( )`).
+  - Starts with a *left parenthesis* `(` and includes all characters until a *balancing right parenthesis* `)`.
+  - Parentheses in *ML comments* (e.g., `(* *)`) or *ML strings* (e.g., `"string ()"`) are *excluded* from balancing.
+- **Purpose**: Embeds SML code for:
+  - User declarations (e.g., helper functions).
+  - Semantic actions in rules.
+  - Certain declarations (e.g., `%header`, `%arg`).
+- **Example**:
+#+BEGIN_SRC sml
+  (* User declarations *)
+  fun add(x, y) = x + y
+  %%
+  %term NUM of int | PLUS
+  %nonterm expr of int
+  %%
+  expr : NUM PLUS NUM ( add($1, $3) )
+#+END_SRC
+- **Key Points**:
+  - ML-Yacc does *not* check the code for syntax errors; it’s passed as-is to the generated parser.
+  - Parentheses in comments or strings don’t affect balancing.
+#+BEGIN_SRC sml
+  ( let val x = "string with ( )" in x end ) (* Valid code block *)
+  ( (* Comment with ( ) *) 42 ) (* Valid code block *)
+#+END_SRC
+
+** Example ML-Yacc Specification
+Here’s how the lexical definitions are used in a complete specification:
+#+BEGIN_SRC sml
+  (* User declarations: SML code, including identifiers and qualified identifiers *)
+  structure Util = MyUtil
+  fun add(x: int, y: int): int = x + y
+  %%
+  (* ML-Yacc declarations: Use % identifiers, reserved words, and ML symbols *)
+  %term NUM of int | PLUS
+  %nonterm expr of int
+  %pos int
+  %start expr
+  %left PLUS
+  %%
+  (* Rules: Use identifiers, reserved symbols, and code blocks *)
+  expr : NUM PLUS NUM ( add($1, $3) )
+       | NUM         ( $1 )
+#+END_SRC
+
+** Practical Implications
+- **Avoid Reserved Words/Symbols**: Don’t use `of`, `for`, `=`, `|`, etc., as terminal/nonterminal names.
+- **Use Valid Identifiers**: Ensure names follow SML identifier rules (e.g., `NUM`, not `2expr`).
+- **Be Careful with Code Blocks**: Ensure ML code in `( )` is valid SML, as ML-Yacc won’t check syntax.
+- **Understand % Identifiers**: Use only the listed % identifiers (e.g., `%term`, not `%custom`) in declarations.
+
+** Summary
+- *Comments*: SML-style `(* *)`, ignored by the parser.
+- *Delimiter*: `%%` separates sections.
+- *Reserved Words/Symbols*: `of`, `for`, `=`, `{`, `}`, `,`, `*`, `->`, `:`, `|`, `(`, `)`.
+- *ML Symbols*:
+  - Identifiers: Alphanumeric names (e.g., `expr`).
+  - Type Variables: Start with `'` (e.g., `'a`).
+  - Integers: Decimal numbers (e.g., `123`).
+  - Qualified Identifiers: Module names (e.g., `List.map`).
+- *Non-ML Symbols*:
+  - % Identifiers: Keywords like `%term`, `%nonterm`.
+  - Code: SML code in `( )`, with comments/strings ignored for balancing.
+These rules ensure ML-Yacc correctly tokenizes and parses the specification to generate a parser.
+
+
+*** Required ML-Yacc Declarations
+
+1. %name: name of the parser with %name. This name is used by lexer
+2. %term and %nonterm should be used in declarations for the tokens;
+3. The type of the variable that the keyword follows should also be defined
+4. Each symbol is separated by "|"
+5. The set of terminal and non-terminals should be disjoined
+6. %pos: must declarte type of position

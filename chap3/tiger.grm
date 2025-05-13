@@ -11,7 +11,11 @@
   | BREAK | NIL
   | FUNCTION | VAR | TYPE 
 
-%nonterm  exp | program
+%nonterm  exp | program | lvalue | vallessexp | seqs | expseqs |  literals
+              | negation | funcall | arthcomp | logicops | forcons | whilecons
+              | looping | args | recordcreate | arraycreate | recassign
+              | assign | ifthen | loopexp | letexp | grp | decs | dec
+              | tydec | vardec | fundec | ty | tyfields
 
 %pos int
 %verbose
@@ -21,10 +25,12 @@
 
 %name Tiger
 
-%keyword WHILE FOR TO BREAK LET IN END FUNCTION VAR TYPE ARRAY IF THEN ELSE 
-	DO OF NIL
+%keyword WHILE FOR TO BREAK LET IN END FUNCTION VAR TYPE ARRAY IF THEN ELSE DO OF NIL
 
 %prefer THEN ELSE LPAREN
+
+%left PLUS MINUS
+%left TIMES DIVIDE
 
 %value ID ("bogus")
 %value INT (1)
@@ -32,7 +38,106 @@
 
 %%
 
-program	: exp				()
+program: exp ()
 
-	
-exp: 			()
+exp: lvalue             ()
+   | vallessexp         ()
+   | seqs               ()
+   | literals           ()
+   | negation           ()
+   | funcall            ()
+   | arthcomp           ()
+   | logicops           ()
+   | recordcreate       ()
+   | arraycreate        ()
+   | assign             ()
+   | ifthen             ()
+   | looping            ()
+   | letexp             ()
+   | grp                ()
+
+
+
+
+seqs: LPAREN expseqs RPAREN ()
+
+expseqs: exp               ()
+   | exp SEMICOLON expseqs ()
+   |                       ()
+
+literals: INT           ()
+        | STRING        ()
+        | MINUS INT     ()
+
+funcall: ID LPAREN args RPAREN ()
+
+args: exp                   ()
+    | exp COMMA args        ()
+
+
+arthcomp: exp PLUS exp    ()
+        | exp MINUS exp   ()
+        | exp TIMES exp   ()
+        | exp DIVIDE exp  ()
+
+logicops: exp AND exp     ()
+        | exp OR exp      ()
+
+
+recordcreate: LBRACE recassign RBRACE ()
+
+recassign: ID EQ exp                  ()
+         | ID EQ exp COMMA recassign  ()
+
+
+arraycreate: ID LBRACK exp RBRACK OF exp    ()
+
+
+assign: lvalue ASSIGN exp     ()
+
+ifthen : IF exp THEN exp ELSE exp     ()
+       | IF exp THEN exp              ()
+
+
+looping: WHILE exp DO loopexp                  ()
+       | FOR ID ASSIGN exp TO exp DO loopexp   ()
+
+loopexp: exp                       ()
+       | exp loopexp               ()
+       | BREAK                     ()
+
+letexp: LET decs IN expseqs END       ()
+
+grp: LPAREN exp RPAREN             ()
+
+
+decs: dec decs                     ()
+    |                              ()
+
+dec: tydec         ()
+   | vardec         ()
+   | fundec         ()
+
+tydec: TYPE ID EQ ty              ()
+
+ty: ID    ()
+  | LBRACE tyfields RBRACE         ()
+  | ARRAY OF ID                    ()
+
+
+tyfields:                                   ()
+        | ID COLON ID                       ()
+        | ID COLON ID COMMA tyfields        ()
+
+
+vardec: VAR ID ASSIGN exp                    ()
+      | VAR ID COLON ID ASSIGN exp           ()
+
+
+fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp             ()
+      | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp    ()
+
+
+lvalue: ID              ()
+      | lvalue LBRACK exp RBRACK ()
+      | lvalue DOT ID   ()
