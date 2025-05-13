@@ -3,7 +3,7 @@ Group is
 $/basis.cm
 $/smlnj-lib.cm
 $/ml-yacc-lib.cm
-tiger.lex
+tiger2.lex
 errormsg.sml
 parsetest.sml
 tiger.grm
