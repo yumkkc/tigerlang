@@ -19,7 +19,7 @@ fun to_int v = List.foldl (fn (a, b) => ord(a) - ord(#"0") + b*10) 0 (explode v)
 alpha=[A-Za-z];
 digit=[0-9];
 alphanumeric=[A-Za-z0-9];
-space=[\ \t];
+space=[\ \t\r];
 %%
 
 <INITIAL>"var" => (Tokens.VAR(yypos, yypos + String.size yytext));
@@ -51,6 +51,7 @@ space=[\ \t];
 <INITIAL>"/" => (Tokens.DIVIDE(yypos, yypos + String.size yytext));
 <INITIAL>"*" => (Tokens.TIMES(yypos, yypos + String.size yytext));
 <INITIAL>"+" => (Tokens.PLUS(yypos, yypos + String.size yytext));
+<INITIAL>"-" => (Tokens.MINUS(yypos, yypos + String.size yytext));
 <INITIAL>"." => (Tokens.DOT(yypos, yypos + String.size yytext));
 <INITIAL>"}" => (Tokens.RBRACE(yypos, yypos + String.size yytext));
 <INITIAL>"{" => (Tokens.LBRACE(yypos, yypos + String.size yytext));

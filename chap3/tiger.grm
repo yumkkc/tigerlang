@@ -81,6 +81,7 @@ funcall: ID LPAREN args RPAREN ()
 
 args: exp                   ()
     | exp COMMA args        ()
+    |                       ()
 
 
 arthcomp: exp PLUS exp    ()
@@ -99,10 +100,11 @@ comrcomp:
         | exp GT exp    ()
         | exp GE exp    ()
 
-recordcreate: LBRACE recassign RBRACE ()
+recordcreate: ID LBRACE recassign RBRACE ()
 
 recassign: ID EQ exp                  ()
          | ID EQ exp COMMA recassign  ()
+         |                            ()
 
 
 arraycreate: ID LBRACK exp RBRACK OF exp    ()
@@ -145,7 +147,11 @@ fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp             ()
 
 lvalue: ID              ()
       | lvalue LBRACK exp RBRACK ()
+      | ID LBRACK exp RBRACK         ()
       | lvalue DOT ID   ()
 
 
 unitexp: LPAREN RPAREN ()
+
+
+(* merge*)
