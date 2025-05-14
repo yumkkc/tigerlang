@@ -12,7 +12,7 @@
   | FUNCTION | VAR | TYPE | UMINUS
 
 %nonterm  exp | program | lvalue | vallessexp | seqs | expseqs
-              | negation | funcall | arthcomp | logicops | forcons | whilecons
+              | negation | funcall | arthcomp | logicops | comrcomp| forcons | whilecons
               | args | recordcreate | arraycreate | recassign
               | assign | ifthen | letexp | decs | dec
               | tydec | vardec | fundec | ty | tyfields | unitexp
@@ -58,6 +58,7 @@ exp: lvalue                     ()
    | funcall                    ()
    | arthcomp                   ()
    | logicops                   ()
+   | comrcomp                   ()
    | recordcreate               ()
    | arraycreate                ()
    | assign                     ()
@@ -90,6 +91,13 @@ arthcomp: exp PLUS exp    ()
 logicops: exp AND exp     ()
         | exp OR exp      ()
 
+comrcomp:
+          exp EQ exp    ()
+        | exp NEQ exp   ()
+        | exp LT exp    ()
+        | exp LE exp    ()
+        | exp GT exp    ()
+        | exp GE exp    ()
 
 recordcreate: LBRACE recassign RBRACE ()
 
