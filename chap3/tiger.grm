@@ -9,13 +9,21 @@
   | AND | OR | ASSIGN
   | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF 
   | BREAK | NIL
-  | FUNCTION | VAR | TYPE 
+  | FUNCTION | VAR | TYPE | UMINUS
 
-%nonterm  exp | program | lvalue | vallessexp | seqs | expseqs |  literals
+%nonterm  exp | program | lvalue | vallessexp | seqs | expseqs
               | negation | funcall | arthcomp | logicops | forcons | whilecons
-              | looping | args | recordcreate | arraycreate | recassign
-              | assign | ifthen | loopexp | letexp | grp | decs | dec
-              | tydec | vardec | fundec | ty | tyfields
+              | args | recordcreate | arraycreate | recassign
+              | assign | ifthen | letexp | decs | dec
+              | tydec | vardec | fundec | ty | tyfields | unitexp
+
+
+%nonassoc ASSIGN
+%left AND OR
+%nonassoc EQ NEQ LT LE GT GE
+%left PLUS MINUS
+%left TIMES DIVIDE
+%left UMINUS
 
 %pos int
 %verbose
@@ -29,8 +37,7 @@
 
 %prefer THEN ELSE LPAREN
 
-%left PLUS MINUS
-%left TIMES DIVIDE
+
 
 %value ID ("bogus")
 %value INT (1)
@@ -40,34 +47,34 @@
 
 program: exp ()
 
-exp: lvalue             ()
-   | vallessexp         ()
-   | seqs               ()
-   | literals           ()
-   | negation           ()
-   | funcall            ()
-   | arthcomp           ()
-   | logicops           ()
-   | recordcreate       ()
-   | arraycreate        ()
-   | assign             ()
-   | ifthen             ()
-   | looping            ()
-   | letexp             ()
-   | grp                ()
+exp: lvalue                     ()
+   | vallessexp                 ()
+   | seqs                       ()
+   | unitexp                    ()
+   | INT                        ()
+   | STRING                     ()
+   | MINUS exp  %prec UMINUS    ()        
+   | negation                   ()
+   | funcall                    ()
+   | arthcomp                   ()
+   | logicops                   ()
+   | recordcreate               ()
+   | arraycreate                ()
+   | assign                     ()
+   | ifthen                     ()
+   | WHILE exp DO exp                      ()
+   | FOR ID ASSIGN exp TO exp DO exp       ()
+   | letexp                     ()
+   | LPAREN exp RPAREN          ()
+   | BREAK                      ()
+   | NIL                        ()
 
+seqs:
+     LPAREN expseqs RPAREN     ()
 
-
-
-seqs: LPAREN expseqs RPAREN ()
-
-expseqs: exp               ()
-   | exp SEMICOLON expseqs ()
-   |                       ()
-
-literals: INT           ()
-        | STRING        ()
-        | MINUS INT     ()
+expseqs: exp                    ()
+   | exp SEMICOLON expseqs      ()
+   |                            ()
 
 funcall: ID LPAREN args RPAREN ()
 
@@ -99,17 +106,7 @@ ifthen : IF exp THEN exp ELSE exp     ()
        | IF exp THEN exp              ()
 
 
-looping: WHILE exp DO loopexp                  ()
-       | FOR ID ASSIGN exp TO exp DO loopexp   ()
-
-loopexp: exp                       ()
-       | exp loopexp               ()
-       | BREAK                     ()
-
 letexp: LET decs IN expseqs END       ()
-
-grp: LPAREN exp RPAREN             ()
-
 
 decs: dec decs                     ()
     |                              ()
@@ -141,3 +138,6 @@ fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp             ()
 lvalue: ID              ()
       | lvalue LBRACK exp RBRACK ()
       | lvalue DOT ID   ()
+
+
+unitexp: LPAREN RPAREN ()

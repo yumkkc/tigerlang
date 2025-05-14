@@ -1,101 +1,39 @@
-31 reduce/reduce conflicts
-64 shift/reduce conflicts
+34 shift/reduce conflicts
 
-error:  state 26: shift/reduce conflict (shift LBRACK, reduce by rule 62)
-error:  state 26: shift/reduce conflict (shift LPAREN, reduce by rule 62)
-error:  state 51: shift/reduce conflict (shift RPAREN, reduce by rule 17)
-error:  state 54: shift/reduce conflict (shift OR, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift AND, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift DIVIDE, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift TIMES, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift MINUS, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift PLUS, reduce by rule 36)
-error:  state 57: shift/reduce conflict (shift OR, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift AND, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift DIVIDE, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift TIMES, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift MINUS, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift PLUS, reduce by rule 31)
-error:  state 58: shift/reduce conflict (shift OR, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift AND, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift DIVIDE, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift TIMES, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift MINUS, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift PLUS, reduce by rule 30)
-error:  state 59: shift/reduce conflict (shift OR, reduce by rule 29)
-error:  state 59: shift/reduce conflict (shift AND, reduce by rule 29)
-error:  state 60: shift/reduce conflict (shift OR, reduce by rule 28)
-error:  state 60: shift/reduce conflict (shift AND, reduce by rule 28)
-error:  state 61: shift/reduce conflict (shift OR, reduce by rule 27)
-error:  state 61: shift/reduce conflict (shift AND, reduce by rule 27)
-error:  state 62: shift/reduce conflict (shift OR, reduce by rule 26)
-error:  state 62: shift/reduce conflict (shift AND, reduce by rule 26)
-error:  state 88: shift/reduce conflict (shift BREAK, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift LET, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift FOR, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift WHILE, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift IF, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift OR, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift AND, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift DIVIDE, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift TIMES, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift MINUS, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift PLUS, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift LBRACE, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift LPAREN, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift STRING, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift INT, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift ID, reduce by rule 41)
-error:  state 90: shift/reduce conflict (shift ELSE, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift OR, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift AND, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift DIVIDE, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift TIMES, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift MINUS, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift PLUS, reduce by rule 38)
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on TYPE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on VAR
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on FUNCTION
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on BREAK
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on END
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on IN
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on LET
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on DO
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on TO
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on FOR
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on WHILE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on ELSE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on THEN
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on IF
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on OR
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on AND
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on DIVIDE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on TIMES
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on MINUS
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on PLUS
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on RBRACE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on LBRACE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on RBRACK
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on RPAREN
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on LPAREN
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on SEMICOLON
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on COMMA
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on STRING
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on INT
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on ID
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on EOF
-error:  state 119: shift/reduce conflict (shift OR, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift AND, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift DIVIDE, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift TIMES, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift MINUS, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift PLUS, reduce by rule 37)
-error:  state 121: shift/reduce conflict (shift OR, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift AND, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift DIVIDE, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift TIMES, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift MINUS, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift PLUS, reduce by rule 35)
+error:  state 23: shift/reduce conflict (shift RPAREN, reduce by rule 25)
+error:  state 26: shift/reduce conflict (shift LBRACK, reduce by rule 59)
+error:  state 51: shift/reduce conflict (shift RPAREN, reduce by rule 23)
+error:  state 88: shift/reduce conflict (shift OR, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift AND, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift DIVIDE, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift TIMES, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift MINUS, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift PLUS, reduce by rule 16)
+error:  state 89: shift/reduce conflict (shift ELSE, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift OR, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift AND, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift DIVIDE, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift TIMES, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift MINUS, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift PLUS, reduce by rule 41)
+error:  state 115: shift/reduce conflict (shift OR, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift AND, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift DIVIDE, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift TIMES, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift MINUS, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift PLUS, reduce by rule 40)
+error:  state 117: shift/reduce conflict (shift OR, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift AND, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift DIVIDE, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift TIMES, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift MINUS, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift PLUS, reduce by rule 38)
+error:  state 128: shift/reduce conflict (shift OR, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift AND, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift DIVIDE, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift TIMES, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift MINUS, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift PLUS, reduce by rule 17)
 
 state 0:
 
@@ -111,137 +49,119 @@ state 0:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 16
-	program	goto 136
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 14
+	program	goto 132
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
 state 1:
 
-	exp : grp .  (reduce by rule 15)
-
-
-
-	.	reduce by rule 15
-
-
-state 2:
-
-	exp : letexp .  (reduce by rule 14)
-
-
-
-	.	reduce by rule 14
-
-
-state 3:
-
-	exp : ifthen .  (reduce by rule 12)
-
-
-
-	.	reduce by rule 12
-
-
-state 4:
-
-	exp : assign .  (reduce by rule 11)
-
-
-
-	.	reduce by rule 11
-
-
-state 5:
-
-	exp : arraycreate .  (reduce by rule 10)
-
-
-
-	.	reduce by rule 10
-
-
-state 6:
-
-	exp : recordcreate .  (reduce by rule 9)
-
-
-
-	.	reduce by rule 9
-
-
-state 7:
-
-	exp : looping .  (reduce by rule 13)
-
-
-
-	.	reduce by rule 13
-
-
-state 8:
-
-	exp : logicops .  (reduce by rule 8)
-
-
-
-	.	reduce by rule 8
-
-
-state 9:
-
-	exp : arthcomp .  (reduce by rule 7)
-
-
-
-	.	reduce by rule 7
-
-
-state 10:
-
-	exp : funcall .  (reduce by rule 6)
-
-
-
-	.	reduce by rule 6
-
-
-state 11:
-
-	exp : negation .  (reduce by rule 5)
-
-
-
-	.	reduce by rule 5
-
-
-state 12:
-
-	exp : literals .  (reduce by rule 4)
+	exp : unitexp .  (reduce by rule 4)
 
 
 
 	.	reduce by rule 4
 
 
-state 13:
+state 2:
+
+	exp : letexp .  (reduce by rule 18)
+
+
+
+	.	reduce by rule 18
+
+
+state 3:
+
+	exp : ifthen .  (reduce by rule 15)
+
+
+
+	.	reduce by rule 15
+
+
+state 4:
+
+	exp : assign .  (reduce by rule 14)
+
+
+
+	.	reduce by rule 14
+
+
+state 5:
+
+	exp : arraycreate .  (reduce by rule 13)
+
+
+
+	.	reduce by rule 13
+
+
+state 6:
+
+	exp : recordcreate .  (reduce by rule 12)
+
+
+
+	.	reduce by rule 12
+
+
+state 7:
+
+	exp : logicops .  (reduce by rule 11)
+
+
+
+	.	reduce by rule 11
+
+
+state 8:
+
+	exp : arthcomp .  (reduce by rule 10)
+
+
+
+	.	reduce by rule 10
+
+
+state 9:
+
+	exp : funcall .  (reduce by rule 9)
+
+
+
+	.	reduce by rule 9
+
+
+state 10:
+
+	exp : negation .  (reduce by rule 8)
+
+
+
+	.	reduce by rule 8
+
+
+state 11:
 
 	exp : seqs .  (reduce by rule 3)
 
@@ -250,7 +170,7 @@ state 13:
 	.	reduce by rule 3
 
 
-state 14:
+state 12:
 
 	exp : vallessexp .  (reduce by rule 2)
 
@@ -259,7 +179,7 @@ state 14:
 	.	reduce by rule 2
 
 
-state 15:
+state 13:
 
 	exp : lvalue .  (reduce by rule 1)
 	lvalue : lvalue . LBRACK exp RBRACK 
@@ -274,7 +194,7 @@ state 15:
 	.	reduce by rule 1
 
 
-state 16:
+state 14:
 
 	program : exp .  (reduce by rule 0)
 	arthcomp : exp . PLUS exp 
@@ -295,6 +215,24 @@ state 16:
 	.	reduce by rule 0
 
 
+state 15:
+
+	exp : NIL .  (reduce by rule 21)
+
+
+
+	.	reduce by rule 21
+
+
+state 16:
+
+	exp : BREAK .  (reduce by rule 20)
+
+
+
+	.	reduce by rule 20
+
+
 state 17:
 
 	letexp : LET . decs IN expseqs END 
@@ -309,12 +247,12 @@ state 17:
 	vardec	goto 37
 	fundec	goto 36
 
-	.	reduce by rule 47
+	.	reduce by rule 44
 
 
 state 18:
 
-	looping : FOR . ID ASSIGN exp TO exp DO loopexp 
+	exp : FOR . ID ASSIGN exp TO exp DO exp 
 
 	ID	shift 44
 
@@ -324,7 +262,7 @@ state 18:
 
 state 19:
 
-	looping : WHILE . exp DO loopexp 
+	exp : WHILE . exp DO exp 
 
 	ID	shift 26
 	INT	shift 25
@@ -336,23 +274,23 @@ state 19:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
 	exp	goto 45
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
@@ -372,33 +310,58 @@ state 20:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
 	exp	goto 46
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
 state 21:
 
-	literals : MINUS . INT 
+	exp : MINUS . exp 
 
-	INT	shift 47
+	ID	shift 26
+	INT	shift 25
+	STRING	shift 24
+	LPAREN	shift 23
+	LBRACE	shift 22
+	MINUS	shift 21
+	IF	shift 20
+	WHILE	shift 19
+	FOR	shift 18
+	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
+	exp	goto 47
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
+	recordcreate	goto 6
+	arraycreate	goto 5
+	assign	goto 4
+	ifthen	goto 3
+	letexp	goto 2
+	unitexp	goto 1
 
 	.	error
 
@@ -413,75 +376,77 @@ state 22:
 
 	.	error
 
+error:  state 23: shift/reduce conflict (shift RPAREN, reduce by rule 25)
 
 state 23:
 
+	exp : LPAREN . exp RPAREN 
 	seqs : LPAREN . expseqs RPAREN 
-	grp : LPAREN . exp RPAREN 
+	unitexp : LPAREN . RPAREN 
 
 	ID	shift 26
 	INT	shift 25
 	STRING	shift 24
 	LPAREN	shift 23
+	RPAREN	shift 52
 	LBRACE	shift 22
 	MINUS	shift 21
 	IF	shift 20
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
 	exp	goto 51
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
 	expseqs	goto 50
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
-	.	reduce by rule 19
+	.	error
 
 
 state 24:
 
-	literals : STRING .  (reduce by rule 21)
+	exp : STRING .  (reduce by rule 6)
 
 
 
-	.	reduce by rule 21
+	.	reduce by rule 6
 
 
 state 25:
 
-	literals : INT .  (reduce by rule 20)
+	exp : INT .  (reduce by rule 5)
 
 
 
-	.	reduce by rule 20
+	.	reduce by rule 5
 
-error:  state 26: shift/reduce conflict (shift LBRACK, reduce by rule 62)
-error:  state 26: shift/reduce conflict (shift LPAREN, reduce by rule 62)
+error:  state 26: shift/reduce conflict (shift LBRACK, reduce by rule 59)
 
 state 26:
 
-	lvalue : ID .  (reduce by rule 62)
+	lvalue : ID .  (reduce by rule 59)
 	funcall : ID . LPAREN args RPAREN 
 	arraycreate : ID . LBRACK exp RBRACK OF exp 
 
-	LPAREN	shift 53
-	LBRACK	shift 52
+	LPAREN	shift 54
+	LBRACK	shift 53
 
 
-	.	reduce by rule 62
+	.	reduce by rule 59
 
 
 state 27:
@@ -498,23 +463,23 @@ state 27:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 54
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 55
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
@@ -523,7 +488,7 @@ state 28:
 
 	lvalue : lvalue DOT . ID 
 
-	ID	shift 55
+	ID	shift 56
 
 
 	.	error
@@ -543,23 +508,23 @@ state 29:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 56
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 57
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
@@ -578,23 +543,23 @@ state 30:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 57
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 58
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
@@ -613,23 +578,23 @@ state 31:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 58
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 59
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
@@ -648,23 +613,23 @@ state 32:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 59
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 60
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
@@ -683,23 +648,23 @@ state 33:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 60
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 61
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
@@ -718,23 +683,23 @@ state 34:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 61
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 62
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
@@ -753,52 +718,52 @@ state 35:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 62
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 63
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
 state 36:
 
-	dec : fundec .  (reduce by rule 50)
+	dec : fundec .  (reduce by rule 47)
 
 
 
-	.	reduce by rule 50
+	.	reduce by rule 47
 
 
 state 37:
 
-	dec : vardec .  (reduce by rule 49)
+	dec : vardec .  (reduce by rule 46)
 
 
 
-	.	reduce by rule 49
+	.	reduce by rule 46
 
 
 state 38:
 
-	dec : tydec .  (reduce by rule 48)
+	dec : tydec .  (reduce by rule 45)
 
 
 
-	.	reduce by rule 48
+	.	reduce by rule 45
 
 
 state 39:
@@ -809,20 +774,20 @@ state 39:
 	VAR	shift 42
 	TYPE	shift 41
 
-	decs	goto 63
+	decs	goto 64
 	dec	goto 39
 	tydec	goto 38
 	vardec	goto 37
 	fundec	goto 36
 
-	.	reduce by rule 47
+	.	reduce by rule 44
 
 
 state 40:
 
 	letexp : LET decs . IN expseqs END 
 
-	IN	shift 64
+	IN	shift 65
 
 
 	.	error
@@ -832,7 +797,7 @@ state 41:
 
 	tydec : TYPE . ID EQ ty 
 
-	ID	shift 65
+	ID	shift 66
 
 
 	.	error
@@ -843,7 +808,7 @@ state 42:
 	vardec : VAR . ID ASSIGN exp 
 	vardec : VAR . ID COLON ID ASSIGN exp 
 
-	ID	shift 66
+	ID	shift 67
 
 
 	.	error
@@ -854,7 +819,7 @@ state 43:
 	fundec : FUNCTION . ID LPAREN tyfields RPAREN EQ exp 
 	fundec : FUNCTION . ID LPAREN tyfields RPAREN COLON ID EQ exp 
 
-	ID	shift 67
+	ID	shift 68
 
 
 	.	error
@@ -862,9 +827,9 @@ state 43:
 
 state 44:
 
-	looping : FOR ID . ASSIGN exp TO exp DO loopexp 
+	exp : FOR ID . ASSIGN exp TO exp DO exp 
 
-	ASSIGN	shift 68
+	ASSIGN	shift 69
 
 
 	.	error
@@ -872,13 +837,13 @@ state 44:
 
 state 45:
 
+	exp : WHILE exp . DO exp 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
 	arthcomp : exp . TIMES exp 
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	looping : WHILE exp . DO loopexp 
 
 	PLUS	shift 35
 	MINUS	shift 34
@@ -886,7 +851,7 @@ state 45:
 	DIVIDE	shift 32
 	AND	shift 31
 	OR	shift 30
-	DO	shift 69
+	DO	shift 70
 
 
 	.	error
@@ -909,7 +874,7 @@ state 46:
 	DIVIDE	shift 32
 	AND	shift 31
 	OR	shift 30
-	THEN	shift 70
+	THEN	shift 71
 
 
 	.	error
@@ -917,18 +882,24 @@ state 46:
 
 state 47:
 
-	literals : MINUS INT .  (reduce by rule 22)
+	exp : MINUS exp .  (reduce by rule 7)
+	arthcomp : exp . PLUS exp 
+	arthcomp : exp . MINUS exp 
+	arthcomp : exp . TIMES exp 
+	arthcomp : exp . DIVIDE exp 
+	logicops : exp . AND exp 
+	logicops : exp . OR exp 
 
 
 
-	.	reduce by rule 22
+	.	reduce by rule 7
 
 
 state 48:
 
 	recordcreate : LBRACE recassign . RBRACE 
 
-	RBRACE	shift 71
+	RBRACE	shift 72
 
 
 	.	error
@@ -939,7 +910,7 @@ state 49:
 	recassign : ID . EQ exp 
 	recassign : ID . EQ exp COMMA recassign 
 
-	EQ	shift 72
+	EQ	shift 73
 
 
 	.	error
@@ -949,16 +920,17 @@ state 50:
 
 	seqs : LPAREN expseqs . RPAREN 
 
-	RPAREN	shift 73
+	RPAREN	shift 74
 
 
 	.	error
 
-error:  state 51: shift/reduce conflict (shift RPAREN, reduce by rule 17)
+error:  state 51: shift/reduce conflict (shift RPAREN, reduce by rule 23)
 
 state 51:
 
-	expseqs : exp .  (reduce by rule 17)
+	exp : LPAREN exp . RPAREN 
+	expseqs : exp .  (reduce by rule 23)
 	expseqs : exp . SEMICOLON expseqs 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
@@ -966,10 +938,9 @@ state 51:
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	grp : LPAREN exp . RPAREN 
 
-	SEMICOLON	shift 75
-	RPAREN	shift 74
+	SEMICOLON	shift 76
+	RPAREN	shift 75
 	PLUS	shift 35
 	MINUS	shift 34
 	TIMES	shift 33
@@ -983,6 +954,15 @@ state 51:
 
 state 52:
 
+	unitexp : LPAREN RPAREN .  (reduce by rule 62)
+
+
+
+	.	reduce by rule 62
+
+
+state 53:
+
 	arraycreate : ID LBRACK . exp RBRACK OF exp 
 
 	ID	shift 26
@@ -995,28 +975,28 @@ state 52:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 76
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 77
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
-state 53:
+state 54:
 
 	funcall : ID LPAREN . args RPAREN 
 
@@ -1030,35 +1010,29 @@ state 53:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 78
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
-	args	goto 77
+	exp	goto 79
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
+	args	goto 78
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
-error:  state 54: shift/reduce conflict (shift OR, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift AND, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift DIVIDE, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift TIMES, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift MINUS, reduce by rule 36)
-error:  state 54: shift/reduce conflict (shift PLUS, reduce by rule 36)
 
-state 54:
+state 55:
 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
@@ -1066,7 +1040,7 @@ state 54:
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	assign : lvalue ASSIGN exp .  (reduce by rule 36)
+	assign : lvalue ASSIGN exp .  (reduce by rule 39)
 
 	PLUS	shift 35
 	MINUS	shift 34
@@ -1076,19 +1050,19 @@ state 54:
 	OR	shift 30
 
 
-	.	reduce by rule 36
-
-
-state 55:
-
-	lvalue : lvalue DOT ID .  (reduce by rule 64)
-
-
-
-	.	reduce by rule 64
+	.	reduce by rule 39
 
 
 state 56:
+
+	lvalue : lvalue DOT ID .  (reduce by rule 61)
+
+
+
+	.	reduce by rule 61
+
+
+state 57:
 
 	lvalue : lvalue LBRACK exp . RBRACK 
 	arthcomp : exp . PLUS exp 
@@ -1098,7 +1072,7 @@ state 56:
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
 
-	RBRACK	shift 79
+	RBRACK	shift 80
 	PLUS	shift 35
 	MINUS	shift 34
 	TIMES	shift 33
@@ -1109,39 +1083,6 @@ state 56:
 
 	.	error
 
-error:  state 57: shift/reduce conflict (shift OR, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift AND, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift DIVIDE, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift TIMES, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift MINUS, reduce by rule 31)
-error:  state 57: shift/reduce conflict (shift PLUS, reduce by rule 31)
-
-state 57:
-
-	arthcomp : exp . PLUS exp 
-	arthcomp : exp . MINUS exp 
-	arthcomp : exp . TIMES exp 
-	arthcomp : exp . DIVIDE exp 
-	logicops : exp . AND exp 
-	logicops : exp . OR exp 
-	logicops : exp OR exp .  (reduce by rule 31)
-
-	PLUS	shift 35
-	MINUS	shift 34
-	TIMES	shift 33
-	DIVIDE	shift 32
-	AND	shift 31
-	OR	shift 30
-
-
-	.	reduce by rule 31
-
-error:  state 58: shift/reduce conflict (shift OR, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift AND, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift DIVIDE, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift TIMES, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift MINUS, reduce by rule 30)
-error:  state 58: shift/reduce conflict (shift PLUS, reduce by rule 30)
 
 state 58:
 
@@ -1150,21 +1091,17 @@ state 58:
 	arthcomp : exp . TIMES exp 
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
-	logicops : exp AND exp .  (reduce by rule 30)
 	logicops : exp . OR exp 
+	logicops : exp OR exp .  (reduce by rule 34)
 
 	PLUS	shift 35
 	MINUS	shift 34
 	TIMES	shift 33
 	DIVIDE	shift 32
-	AND	shift 31
-	OR	shift 30
 
 
-	.	reduce by rule 30
+	.	reduce by rule 34
 
-error:  state 59: shift/reduce conflict (shift OR, reduce by rule 29)
-error:  state 59: shift/reduce conflict (shift AND, reduce by rule 29)
 
 state 59:
 
@@ -1172,43 +1109,54 @@ state 59:
 	arthcomp : exp . MINUS exp 
 	arthcomp : exp . TIMES exp 
 	arthcomp : exp . DIVIDE exp 
-	arthcomp : exp DIVIDE exp .  (reduce by rule 29)
 	logicops : exp . AND exp 
+	logicops : exp AND exp .  (reduce by rule 33)
 	logicops : exp . OR exp 
 
-	AND	shift 31
-	OR	shift 30
+	PLUS	shift 35
+	MINUS	shift 34
+	TIMES	shift 33
+	DIVIDE	shift 32
 
 
-	.	reduce by rule 29
+	.	reduce by rule 33
 
-error:  state 60: shift/reduce conflict (shift OR, reduce by rule 28)
-error:  state 60: shift/reduce conflict (shift AND, reduce by rule 28)
 
 state 60:
 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
 	arthcomp : exp . TIMES exp 
-	arthcomp : exp TIMES exp .  (reduce by rule 28)
 	arthcomp : exp . DIVIDE exp 
+	arthcomp : exp DIVIDE exp .  (reduce by rule 32)
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
 
-	AND	shift 31
-	OR	shift 30
 
 
-	.	reduce by rule 28
+	.	reduce by rule 32
 
-error:  state 61: shift/reduce conflict (shift OR, reduce by rule 27)
-error:  state 61: shift/reduce conflict (shift AND, reduce by rule 27)
 
 state 61:
 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
-	arthcomp : exp MINUS exp .  (reduce by rule 27)
+	arthcomp : exp . TIMES exp 
+	arthcomp : exp TIMES exp .  (reduce by rule 31)
+	arthcomp : exp . DIVIDE exp 
+	logicops : exp . AND exp 
+	logicops : exp . OR exp 
+
+
+
+	.	reduce by rule 31
+
+
+state 62:
+
+	arthcomp : exp . PLUS exp 
+	arthcomp : exp . MINUS exp 
+	arthcomp : exp MINUS exp .  (reduce by rule 30)
 	arthcomp : exp . TIMES exp 
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
@@ -1216,19 +1164,15 @@ state 61:
 
 	TIMES	shift 33
 	DIVIDE	shift 32
-	AND	shift 31
-	OR	shift 30
 
 
-	.	reduce by rule 27
+	.	reduce by rule 30
 
-error:  state 62: shift/reduce conflict (shift OR, reduce by rule 26)
-error:  state 62: shift/reduce conflict (shift AND, reduce by rule 26)
 
-state 62:
+state 63:
 
 	arthcomp : exp . PLUS exp 
-	arthcomp : exp PLUS exp .  (reduce by rule 26)
+	arthcomp : exp PLUS exp .  (reduce by rule 29)
 	arthcomp : exp . MINUS exp 
 	arthcomp : exp . TIMES exp 
 	arthcomp : exp . DIVIDE exp 
@@ -1237,23 +1181,21 @@ state 62:
 
 	TIMES	shift 33
 	DIVIDE	shift 32
-	AND	shift 31
-	OR	shift 30
 
 
-	.	reduce by rule 26
-
-
-state 63:
-
-	decs : dec decs .  (reduce by rule 46)
-
-
-
-	.	reduce by rule 46
+	.	reduce by rule 29
 
 
 state 64:
+
+	decs : dec decs .  (reduce by rule 43)
+
+
+
+	.	reduce by rule 43
+
+
+state 65:
 
 	letexp : LET decs IN . expseqs END 
 
@@ -1267,45 +1209,33 @@ state 64:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 81
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	expseqs	goto 80
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 82
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	expseqs	goto 81
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
-	.	reduce by rule 19
-
-
-state 65:
-
-	tydec : TYPE ID . EQ ty 
-
-	EQ	shift 82
-
-
-	.	error
+	.	reduce by rule 25
 
 
 state 66:
 
-	vardec : VAR ID . ASSIGN exp 
-	vardec : VAR ID . COLON ID ASSIGN exp 
+	tydec : TYPE ID . EQ ty 
 
-	COLON	shift 84
-	ASSIGN	shift 83
+	EQ	shift 83
 
 
 	.	error
@@ -1313,10 +1243,11 @@ state 66:
 
 state 67:
 
-	fundec : FUNCTION ID . LPAREN tyfields RPAREN EQ exp 
-	fundec : FUNCTION ID . LPAREN tyfields RPAREN COLON ID EQ exp 
+	vardec : VAR ID . ASSIGN exp 
+	vardec : VAR ID . COLON ID ASSIGN exp 
 
-	LPAREN	shift 85
+	COLON	shift 85
+	ASSIGN	shift 84
 
 
 	.	error
@@ -1324,42 +1255,18 @@ state 67:
 
 state 68:
 
-	looping : FOR ID ASSIGN . exp TO exp DO loopexp 
+	fundec : FUNCTION ID . LPAREN tyfields RPAREN EQ exp 
+	fundec : FUNCTION ID . LPAREN tyfields RPAREN COLON ID EQ exp 
 
-	ID	shift 26
-	INT	shift 25
-	STRING	shift 24
-	LPAREN	shift 23
-	LBRACE	shift 22
-	MINUS	shift 21
-	IF	shift 20
-	WHILE	shift 19
-	FOR	shift 18
-	LET	shift 17
+	LPAREN	shift 86
 
-	exp	goto 86
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
-	recordcreate	goto 6
-	arraycreate	goto 5
-	assign	goto 4
-	ifthen	goto 3
-	letexp	goto 2
-	grp	goto 1
 
 	.	error
 
 
 state 69:
 
-	looping : WHILE exp DO . loopexp 
+	exp : FOR ID ASSIGN . exp TO exp DO exp 
 
 	ID	shift 26
 	INT	shift 25
@@ -1371,30 +1278,63 @@ state 69:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
-	BREAK	shift 89
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 88
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 87
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
-	loopexp	goto 87
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
 state 70:
+
+	exp : WHILE exp DO . exp 
+
+	ID	shift 26
+	INT	shift 25
+	STRING	shift 24
+	LPAREN	shift 23
+	LBRACE	shift 22
+	MINUS	shift 21
+	IF	shift 20
+	WHILE	shift 19
+	FOR	shift 18
+	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
+
+	exp	goto 88
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
+	recordcreate	goto 6
+	arraycreate	goto 5
+	assign	goto 4
+	ifthen	goto 3
+	letexp	goto 2
+	unitexp	goto 1
+
+	.	error
+
+
+state 71:
 
 	ifthen : IF exp THEN . exp ELSE exp 
 	ifthen : IF exp THEN . exp 
@@ -1409,37 +1349,37 @@ state 70:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 90
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 89
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
-state 71:
-
-	recordcreate : LBRACE recassign RBRACE .  (reduce by rule 32)
-
-
-
-	.	reduce by rule 32
-
-
 state 72:
+
+	recordcreate : LBRACE recassign RBRACE .  (reduce by rule 35)
+
+
+
+	.	reduce by rule 35
+
+
+state 73:
 
 	recassign : ID EQ . exp 
 	recassign : ID EQ . exp COMMA recassign 
@@ -1454,46 +1394,46 @@ state 72:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 91
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 90
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
-state 73:
-
-	seqs : LPAREN expseqs RPAREN .  (reduce by rule 16)
-
-
-
-	.	reduce by rule 16
-
-
 state 74:
 
-	grp : LPAREN exp RPAREN .  (reduce by rule 45)
+	seqs : LPAREN expseqs RPAREN .  (reduce by rule 22)
 
 
 
-	.	reduce by rule 45
+	.	reduce by rule 22
 
 
 state 75:
+
+	exp : LPAREN exp RPAREN .  (reduce by rule 19)
+
+
+
+	.	reduce by rule 19
+
+
+state 76:
 
 	expseqs : exp SEMICOLON . expseqs 
 
@@ -1507,29 +1447,29 @@ state 75:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 81
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	expseqs	goto 92
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 82
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	expseqs	goto 91
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
-	.	reduce by rule 19
+	.	reduce by rule 25
 
 
-state 76:
+state 77:
 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
@@ -1539,23 +1479,13 @@ state 76:
 	logicops : exp . OR exp 
 	arraycreate : ID LBRACK exp . RBRACK OF exp 
 
-	RBRACK	shift 93
+	RBRACK	shift 92
 	PLUS	shift 35
 	MINUS	shift 34
 	TIMES	shift 33
 	DIVIDE	shift 32
 	AND	shift 31
 	OR	shift 30
-
-
-	.	error
-
-
-state 77:
-
-	funcall : ID LPAREN args . RPAREN 
-
-	RPAREN	shift 94
 
 
 	.	error
@@ -1563,16 +1493,26 @@ state 77:
 
 state 78:
 
+	funcall : ID LPAREN args . RPAREN 
+
+	RPAREN	shift 93
+
+
+	.	error
+
+
+state 79:
+
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
 	arthcomp : exp . TIMES exp 
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	args : exp .  (reduce by rule 24)
+	args : exp .  (reduce by rule 27)
 	args : exp . COMMA args 
 
-	COMMA	shift 95
+	COMMA	shift 94
 	PLUS	shift 35
 	MINUS	shift 34
 	TIMES	shift 33
@@ -1581,31 +1521,31 @@ state 78:
 	OR	shift 30
 
 
-	.	reduce by rule 24
-
-
-state 79:
-
-	lvalue : lvalue LBRACK exp RBRACK .  (reduce by rule 63)
-
-
-
-	.	reduce by rule 63
+	.	reduce by rule 27
 
 
 state 80:
 
+	lvalue : lvalue LBRACK exp RBRACK .  (reduce by rule 60)
+
+
+
+	.	reduce by rule 60
+
+
+state 81:
+
 	letexp : LET decs IN expseqs . END 
 
-	END	shift 96
+	END	shift 95
 
 
 	.	error
 
 
-state 81:
+state 82:
 
-	expseqs : exp .  (reduce by rule 17)
+	expseqs : exp .  (reduce by rule 23)
 	expseqs : exp . SEMICOLON expseqs 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
@@ -1614,7 +1554,7 @@ state 81:
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
 
-	SEMICOLON	shift 75
+	SEMICOLON	shift 76
 	PLUS	shift 35
 	MINUS	shift 34
 	TIMES	shift 33
@@ -1623,23 +1563,23 @@ state 81:
 	OR	shift 30
 
 
-	.	reduce by rule 17
+	.	reduce by rule 23
 
 
-state 82:
+state 83:
 
 	tydec : TYPE ID EQ . ty 
 
-	ID	shift 100
-	LBRACE	shift 99
-	ARRAY	shift 98
+	ID	shift 99
+	LBRACE	shift 98
+	ARRAY	shift 97
 
-	ty	goto 97
+	ty	goto 96
 
 	.	error
 
 
-state 83:
+state 84:
 
 	vardec : VAR ID ASSIGN . exp 
 
@@ -1653,58 +1593,58 @@ state 83:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 101
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 100
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
-
-	.	error
-
-
-state 84:
-
-	vardec : VAR ID COLON . ID ASSIGN exp 
-
-	ID	shift 102
-
+	unitexp	goto 1
 
 	.	error
 
 
 state 85:
 
-	fundec : FUNCTION ID LPAREN . tyfields RPAREN EQ exp 
-	fundec : FUNCTION ID LPAREN . tyfields RPAREN COLON ID EQ exp 
+	vardec : VAR ID COLON . ID ASSIGN exp 
 
-	ID	shift 104
+	ID	shift 101
 
-	tyfields	goto 103
 
-	.	reduce by rule 55
+	.	error
 
 
 state 86:
 
+	fundec : FUNCTION ID LPAREN . tyfields RPAREN EQ exp 
+	fundec : FUNCTION ID LPAREN . tyfields RPAREN COLON ID EQ exp 
+
+	ID	shift 103
+
+	tyfields	goto 102
+
+	.	reduce by rule 52
+
+
+state 87:
+
+	exp : FOR ID ASSIGN exp . TO exp DO exp 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
 	arthcomp : exp . TIMES exp 
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	looping : FOR ID ASSIGN exp . TO exp DO loopexp 
 
 	PLUS	shift 35
 	MINUS	shift 34
@@ -1712,38 +1652,47 @@ state 86:
 	DIVIDE	shift 32
 	AND	shift 31
 	OR	shift 30
-	TO	shift 105
+	TO	shift 104
 
 
 	.	error
 
-
-state 87:
-
-	looping : WHILE exp DO loopexp .  (reduce by rule 39)
-
-
-
-	.	reduce by rule 39
-
-error:  state 88: shift/reduce conflict (shift BREAK, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift LET, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift FOR, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift WHILE, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift IF, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift OR, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift AND, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift DIVIDE, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift TIMES, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift MINUS, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift PLUS, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift LBRACE, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift LPAREN, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift STRING, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift INT, reduce by rule 41)
-error:  state 88: shift/reduce conflict (shift ID, reduce by rule 41)
+error:  state 88: shift/reduce conflict (shift OR, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift AND, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift DIVIDE, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift TIMES, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift MINUS, reduce by rule 16)
+error:  state 88: shift/reduce conflict (shift PLUS, reduce by rule 16)
 
 state 88:
+
+	exp : WHILE exp DO exp .  (reduce by rule 16)
+	arthcomp : exp . PLUS exp 
+	arthcomp : exp . MINUS exp 
+	arthcomp : exp . TIMES exp 
+	arthcomp : exp . DIVIDE exp 
+	logicops : exp . AND exp 
+	logicops : exp . OR exp 
+
+	PLUS	shift 35
+	MINUS	shift 34
+	TIMES	shift 33
+	DIVIDE	shift 32
+	AND	shift 31
+	OR	shift 30
+
+
+	.	reduce by rule 16
+
+error:  state 89: shift/reduce conflict (shift ELSE, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift OR, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift AND, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift DIVIDE, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift TIMES, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift MINUS, reduce by rule 41)
+error:  state 89: shift/reduce conflict (shift PLUS, reduce by rule 41)
+
+state 89:
 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
@@ -1751,62 +1700,20 @@ state 88:
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	loopexp : exp .  (reduce by rule 41)
-	loopexp : exp . loopexp 
+	ifthen : IF exp THEN exp . ELSE exp 
+	ifthen : IF exp THEN exp .  (reduce by rule 41)
 
-	ID	shift 26
-	INT	shift 25
-	STRING	shift 24
-	LPAREN	shift 23
-	LBRACE	shift 22
 	PLUS	shift 35
-	MINUS	shift 107
+	MINUS	shift 34
 	TIMES	shift 33
 	DIVIDE	shift 32
 	AND	shift 31
 	OR	shift 30
-	IF	shift 20
-	WHILE	shift 19
-	FOR	shift 18
-	LET	shift 17
-	BREAK	shift 89
+	ELSE	shift 105
 
-	exp	goto 88
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
-	recordcreate	goto 6
-	arraycreate	goto 5
-	assign	goto 4
-	ifthen	goto 3
-	loopexp	goto 106
-	letexp	goto 2
-	grp	goto 1
 
 	.	reduce by rule 41
 
-
-state 89:
-
-	loopexp : BREAK .  (reduce by rule 43)
-
-
-
-	.	reduce by rule 43
-
-error:  state 90: shift/reduce conflict (shift ELSE, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift OR, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift AND, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift DIVIDE, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift TIMES, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift MINUS, reduce by rule 38)
-error:  state 90: shift/reduce conflict (shift PLUS, reduce by rule 38)
 
 state 90:
 
@@ -1816,73 +1723,50 @@ state 90:
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	ifthen : IF exp THEN exp . ELSE exp 
-	ifthen : IF exp THEN exp .  (reduce by rule 38)
+	recassign : ID EQ exp .  (reduce by rule 36)
+	recassign : ID EQ exp . COMMA recassign 
 
+	COMMA	shift 106
 	PLUS	shift 35
 	MINUS	shift 34
 	TIMES	shift 33
 	DIVIDE	shift 32
 	AND	shift 31
 	OR	shift 30
-	ELSE	shift 108
 
 
-	.	reduce by rule 38
+	.	reduce by rule 36
 
 
 state 91:
 
-	arthcomp : exp . PLUS exp 
-	arthcomp : exp . MINUS exp 
-	arthcomp : exp . TIMES exp 
-	arthcomp : exp . DIVIDE exp 
-	logicops : exp . AND exp 
-	logicops : exp . OR exp 
-	recassign : ID EQ exp .  (reduce by rule 33)
-	recassign : ID EQ exp . COMMA recassign 
-
-	COMMA	shift 109
-	PLUS	shift 35
-	MINUS	shift 34
-	TIMES	shift 33
-	DIVIDE	shift 32
-	AND	shift 31
-	OR	shift 30
+	expseqs : exp SEMICOLON expseqs .  (reduce by rule 24)
 
 
-	.	reduce by rule 33
+
+	.	reduce by rule 24
 
 
 state 92:
 
-	expseqs : exp SEMICOLON expseqs .  (reduce by rule 18)
-
-
-
-	.	reduce by rule 18
-
-
-state 93:
-
 	arraycreate : ID LBRACK exp RBRACK . OF exp 
 
-	OF	shift 110
+	OF	shift 107
 
 
 	.	error
 
 
+state 93:
+
+	funcall : ID LPAREN args RPAREN .  (reduce by rule 26)
+
+
+
+	.	reduce by rule 26
+
+
 state 94:
-
-	funcall : ID LPAREN args RPAREN .  (reduce by rule 23)
-
-
-
-	.	reduce by rule 23
-
-
-state 95:
 
 	args : exp COMMA . args 
 
@@ -1896,77 +1780,77 @@ state 95:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 78
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
-	args	goto 111
+	exp	goto 79
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
+	args	goto 108
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
+
+
+state 95:
+
+	letexp : LET decs IN expseqs END .  (reduce by rule 42)
+
+
+
+	.	reduce by rule 42
 
 
 state 96:
 
-	letexp : LET decs IN expseqs END .  (reduce by rule 44)
+	tydec : TYPE ID EQ ty .  (reduce by rule 48)
 
 
 
-	.	reduce by rule 44
+	.	reduce by rule 48
 
 
 state 97:
 
-	tydec : TYPE ID EQ ty .  (reduce by rule 51)
-
-
-
-	.	reduce by rule 51
-
-
-state 98:
-
 	ty : ARRAY . OF ID 
 
-	OF	shift 112
+	OF	shift 109
 
 
 	.	error
 
 
-state 99:
+state 98:
 
 	ty : LBRACE . tyfields RBRACE 
 
-	ID	shift 104
+	ID	shift 103
 
-	tyfields	goto 113
-
-	.	reduce by rule 55
-
-
-state 100:
-
-	ty : ID .  (reduce by rule 52)
-
-
+	tyfields	goto 110
 
 	.	reduce by rule 52
 
 
-state 101:
+state 99:
+
+	ty : ID .  (reduce by rule 49)
+
+
+
+	.	reduce by rule 49
+
+
+state 100:
 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
@@ -1974,7 +1858,7 @@ state 101:
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	vardec : VAR ID ASSIGN exp .  (reduce by rule 58)
+	vardec : VAR ID ASSIGN exp .  (reduce by rule 55)
 
 	PLUS	shift 35
 	MINUS	shift 34
@@ -1984,14 +1868,25 @@ state 101:
 	OR	shift 30
 
 
-	.	reduce by rule 58
+	.	reduce by rule 55
+
+
+state 101:
+
+	vardec : VAR ID COLON ID . ASSIGN exp 
+
+	ASSIGN	shift 111
+
+
+	.	error
 
 
 state 102:
 
-	vardec : VAR ID COLON ID . ASSIGN exp 
+	fundec : FUNCTION ID LPAREN tyfields . RPAREN EQ exp 
+	fundec : FUNCTION ID LPAREN tyfields . RPAREN COLON ID EQ exp 
 
-	ASSIGN	shift 114
+	RPAREN	shift 112
 
 
 	.	error
@@ -1999,10 +1894,10 @@ state 102:
 
 state 103:
 
-	fundec : FUNCTION ID LPAREN tyfields . RPAREN EQ exp 
-	fundec : FUNCTION ID LPAREN tyfields . RPAREN COLON ID EQ exp 
+	tyfields : ID . COLON ID 
+	tyfields : ID . COLON ID COMMA tyfields 
 
-	RPAREN	shift 115
+	COLON	shift 113
 
 
 	.	error
@@ -2010,18 +1905,7 @@ state 103:
 
 state 104:
 
-	tyfields : ID . COLON ID 
-	tyfields : ID . COLON ID COMMA tyfields 
-
-	COLON	shift 116
-
-
-	.	error
-
-
-state 105:
-
-	looping : FOR ID ASSIGN exp TO . exp DO loopexp 
+	exp : FOR ID ASSIGN exp TO . exp DO exp 
 
 	ID	shift 26
 	INT	shift 25
@@ -2033,73 +1917,28 @@ state 105:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 117
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 114
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
-state 106:
-
-	loopexp : exp loopexp .  (reduce by rule 42)
-
-
-
-	.	reduce by rule 42
-
-
-state 107:
-
-	literals : MINUS . INT 
-	arthcomp : exp MINUS . exp 
-
-	ID	shift 26
-	INT	shift 118
-	STRING	shift 24
-	LPAREN	shift 23
-	LBRACE	shift 22
-	MINUS	shift 21
-	IF	shift 20
-	WHILE	shift 19
-	FOR	shift 18
-	LET	shift 17
-
-	exp	goto 61
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
-	recordcreate	goto 6
-	arraycreate	goto 5
-	assign	goto 4
-	ifthen	goto 3
-	letexp	goto 2
-	grp	goto 1
-
-	.	error
-
-
-state 108:
+state 105:
 
 	ifthen : IF exp THEN exp ELSE . exp 
 
@@ -2113,39 +1952,39 @@ state 108:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 119
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 115
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
-state 109:
+state 106:
 
 	recassign : ID EQ exp COMMA . recassign 
 
 	ID	shift 49
 
-	recassign	goto 120
+	recassign	goto 116
 
 	.	error
 
 
-state 110:
+state 107:
 
 	arraycreate : ID LBRACK exp RBRACK OF . exp 
 
@@ -2159,57 +1998,57 @@ state 110:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 121
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 117
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
+
+	.	error
+
+
+state 108:
+
+	args : exp COMMA args .  (reduce by rule 28)
+
+
+
+	.	reduce by rule 28
+
+
+state 109:
+
+	ty : ARRAY OF . ID 
+
+	ID	shift 118
+
+
+	.	error
+
+
+state 110:
+
+	ty : LBRACE tyfields . RBRACE 
+
+	RBRACE	shift 119
+
 
 	.	error
 
 
 state 111:
-
-	args : exp COMMA args .  (reduce by rule 25)
-
-
-
-	.	reduce by rule 25
-
-
-state 112:
-
-	ty : ARRAY OF . ID 
-
-	ID	shift 122
-
-
-	.	error
-
-
-state 113:
-
-	ty : LBRACE tyfields . RBRACE 
-
-	RBRACE	shift 123
-
-
-	.	error
-
-
-state 114:
 
 	vardec : VAR ID COLON ID ASSIGN . exp 
 
@@ -2223,49 +2062,113 @@ state 114:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 124
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 120
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
-state 115:
+state 112:
 
 	fundec : FUNCTION ID LPAREN tyfields RPAREN . EQ exp 
 	fundec : FUNCTION ID LPAREN tyfields RPAREN . COLON ID EQ exp 
 
-	COLON	shift 126
-	EQ	shift 125
+	COLON	shift 122
+	EQ	shift 121
 
 
 	.	error
 
 
-state 116:
+state 113:
 
 	tyfields : ID COLON . ID 
 	tyfields : ID COLON . ID COMMA tyfields 
 
-	ID	shift 127
+	ID	shift 123
 
 
 	.	error
 
+
+state 114:
+
+	exp : FOR ID ASSIGN exp TO exp . DO exp 
+	arthcomp : exp . PLUS exp 
+	arthcomp : exp . MINUS exp 
+	arthcomp : exp . TIMES exp 
+	arthcomp : exp . DIVIDE exp 
+	logicops : exp . AND exp 
+	logicops : exp . OR exp 
+
+	PLUS	shift 35
+	MINUS	shift 34
+	TIMES	shift 33
+	DIVIDE	shift 32
+	AND	shift 31
+	OR	shift 30
+	DO	shift 124
+
+
+	.	error
+
+error:  state 115: shift/reduce conflict (shift OR, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift AND, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift DIVIDE, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift TIMES, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift MINUS, reduce by rule 40)
+error:  state 115: shift/reduce conflict (shift PLUS, reduce by rule 40)
+
+state 115:
+
+	arthcomp : exp . PLUS exp 
+	arthcomp : exp . MINUS exp 
+	arthcomp : exp . TIMES exp 
+	arthcomp : exp . DIVIDE exp 
+	logicops : exp . AND exp 
+	logicops : exp . OR exp 
+	ifthen : IF exp THEN exp ELSE exp .  (reduce by rule 40)
+
+	PLUS	shift 35
+	MINUS	shift 34
+	TIMES	shift 33
+	DIVIDE	shift 32
+	AND	shift 31
+	OR	shift 30
+
+
+	.	reduce by rule 40
+
+
+state 116:
+
+	recassign : ID EQ exp COMMA recassign .  (reduce by rule 37)
+
+
+
+	.	reduce by rule 37
+
+error:  state 117: shift/reduce conflict (shift OR, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift AND, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift DIVIDE, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift TIMES, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift MINUS, reduce by rule 38)
+error:  state 117: shift/reduce conflict (shift PLUS, reduce by rule 38)
 
 state 117:
 
@@ -2275,7 +2178,7 @@ state 117:
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	looping : FOR ID ASSIGN exp TO exp . DO loopexp 
+	arraycreate : ID LBRACK exp RBRACK OF exp .  (reduce by rule 38)
 
 	PLUS	shift 35
 	MINUS	shift 34
@@ -2283,187 +2186,51 @@ state 117:
 	DIVIDE	shift 32
 	AND	shift 31
 	OR	shift 30
-	DO	shift 128
 
 
-	.	error
+	.	reduce by rule 38
 
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on TYPE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on VAR
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on FUNCTION
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on BREAK
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on END
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on IN
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on LET
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on DO
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on TO
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on FOR
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on WHILE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on ELSE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on THEN
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on IF
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on OR
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on AND
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on DIVIDE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on TIMES
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on MINUS
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on PLUS
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on RBRACE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on LBRACE
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on RBRACK
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on RPAREN
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on LPAREN
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on SEMICOLON
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on COMMA
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on STRING
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on INT
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on ID
-error:  state 118: reduce/reduce conflict between rule 22 and rule 20 on EOF
 
 state 118:
 
-	literals : INT .  (reduce by rule 20)
-	literals : MINUS INT .  (reduce by rule 22)
-
-	EOF	reduce by rule 20
-	ID	reduce by rule 20
-	INT	reduce by rule 20
-	STRING	reduce by rule 20
-	COMMA	reduce by rule 20
-	SEMICOLON	reduce by rule 20
-	LPAREN	reduce by rule 20
-	RPAREN	reduce by rule 20
-	RBRACK	reduce by rule 20
-	LBRACE	reduce by rule 20
-	RBRACE	reduce by rule 20
-	PLUS	reduce by rule 20
-	MINUS	reduce by rule 20
-	TIMES	reduce by rule 20
-	DIVIDE	reduce by rule 20
-	AND	reduce by rule 20
-	OR	reduce by rule 20
-	IF	reduce by rule 20
-	THEN	reduce by rule 20
-	ELSE	reduce by rule 20
-	WHILE	reduce by rule 20
-	FOR	reduce by rule 20
-	TO	reduce by rule 20
-	DO	reduce by rule 20
-	LET	reduce by rule 20
-	IN	reduce by rule 20
-	END	reduce by rule 20
-	BREAK	reduce by rule 20
-	FUNCTION	reduce by rule 20
-	VAR	reduce by rule 20
-	TYPE	reduce by rule 20
+	ty : ARRAY OF ID .  (reduce by rule 51)
 
 
-	.	error
 
-error:  state 119: shift/reduce conflict (shift OR, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift AND, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift DIVIDE, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift TIMES, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift MINUS, reduce by rule 37)
-error:  state 119: shift/reduce conflict (shift PLUS, reduce by rule 37)
+	.	reduce by rule 51
+
 
 state 119:
 
-	arthcomp : exp . PLUS exp 
-	arthcomp : exp . MINUS exp 
-	arthcomp : exp . TIMES exp 
-	arthcomp : exp . DIVIDE exp 
-	logicops : exp . AND exp 
-	logicops : exp . OR exp 
-	ifthen : IF exp THEN exp ELSE exp .  (reduce by rule 37)
-
-	PLUS	shift 35
-	MINUS	shift 34
-	TIMES	shift 33
-	DIVIDE	shift 32
-	AND	shift 31
-	OR	shift 30
+	ty : LBRACE tyfields RBRACE .  (reduce by rule 50)
 
 
-	.	reduce by rule 37
+
+	.	reduce by rule 50
 
 
 state 120:
 
-	recassign : ID EQ exp COMMA recassign .  (reduce by rule 34)
+	arthcomp : exp . PLUS exp 
+	arthcomp : exp . MINUS exp 
+	arthcomp : exp . TIMES exp 
+	arthcomp : exp . DIVIDE exp 
+	logicops : exp . AND exp 
+	logicops : exp . OR exp 
+	vardec : VAR ID COLON ID ASSIGN exp .  (reduce by rule 56)
+
+	PLUS	shift 35
+	MINUS	shift 34
+	TIMES	shift 33
+	DIVIDE	shift 32
+	AND	shift 31
+	OR	shift 30
 
 
+	.	reduce by rule 56
 
-	.	reduce by rule 34
-
-error:  state 121: shift/reduce conflict (shift OR, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift AND, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift DIVIDE, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift TIMES, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift MINUS, reduce by rule 35)
-error:  state 121: shift/reduce conflict (shift PLUS, reduce by rule 35)
 
 state 121:
-
-	arthcomp : exp . PLUS exp 
-	arthcomp : exp . MINUS exp 
-	arthcomp : exp . TIMES exp 
-	arthcomp : exp . DIVIDE exp 
-	logicops : exp . AND exp 
-	logicops : exp . OR exp 
-	arraycreate : ID LBRACK exp RBRACK OF exp .  (reduce by rule 35)
-
-	PLUS	shift 35
-	MINUS	shift 34
-	TIMES	shift 33
-	DIVIDE	shift 32
-	AND	shift 31
-	OR	shift 30
-
-
-	.	reduce by rule 35
-
-
-state 122:
-
-	ty : ARRAY OF ID .  (reduce by rule 54)
-
-
-
-	.	reduce by rule 54
-
-
-state 123:
-
-	ty : LBRACE tyfields RBRACE .  (reduce by rule 53)
-
-
-
-	.	reduce by rule 53
-
-
-state 124:
-
-	arthcomp : exp . PLUS exp 
-	arthcomp : exp . MINUS exp 
-	arthcomp : exp . TIMES exp 
-	arthcomp : exp . DIVIDE exp 
-	logicops : exp . AND exp 
-	logicops : exp . OR exp 
-	vardec : VAR ID COLON ID ASSIGN exp .  (reduce by rule 59)
-
-	PLUS	shift 35
-	MINUS	shift 34
-	TIMES	shift 33
-	DIVIDE	shift 32
-	AND	shift 31
-	OR	shift 30
-
-
-	.	reduce by rule 59
-
-
-state 125:
 
 	fundec : FUNCTION ID LPAREN tyfields RPAREN EQ . exp 
 
@@ -2477,51 +2244,51 @@ state 125:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 129
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 125
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
-state 126:
+state 122:
 
 	fundec : FUNCTION ID LPAREN tyfields RPAREN COLON . ID EQ exp 
 
-	ID	shift 130
+	ID	shift 126
 
 
 	.	error
 
 
-state 127:
+state 123:
 
-	tyfields : ID COLON ID .  (reduce by rule 56)
+	tyfields : ID COLON ID .  (reduce by rule 53)
 	tyfields : ID COLON ID . COMMA tyfields 
 
-	COMMA	shift 131
+	COMMA	shift 127
 
 
-	.	reduce by rule 56
+	.	reduce by rule 53
 
 
-state 128:
+state 124:
 
-	looping : FOR ID ASSIGN exp TO exp DO . loopexp 
+	exp : FOR ID ASSIGN exp TO exp DO . exp 
 
 	ID	shift 26
 	INT	shift 25
@@ -2533,30 +2300,28 @@ state 128:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
-	BREAK	shift 89
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 88
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 128
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
-	loopexp	goto 132
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
-state 129:
+state 125:
 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
@@ -2564,7 +2329,7 @@ state 129:
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	fundec : FUNCTION ID LPAREN tyfields RPAREN EQ exp .  (reduce by rule 60)
+	fundec : FUNCTION ID LPAREN tyfields RPAREN EQ exp .  (reduce by rule 57)
 
 	PLUS	shift 35
 	MINUS	shift 34
@@ -2574,40 +2339,58 @@ state 129:
 	OR	shift 30
 
 
-	.	reduce by rule 60
+	.	reduce by rule 57
 
 
-state 130:
+state 126:
 
 	fundec : FUNCTION ID LPAREN tyfields RPAREN COLON ID . EQ exp 
 
-	EQ	shift 133
+	EQ	shift 129
 
 
 	.	error
 
 
-state 131:
+state 127:
 
 	tyfields : ID COLON ID COMMA . tyfields 
 
-	ID	shift 104
+	ID	shift 103
 
-	tyfields	goto 134
+	tyfields	goto 130
 
-	.	reduce by rule 55
+	.	reduce by rule 52
+
+error:  state 128: shift/reduce conflict (shift OR, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift AND, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift DIVIDE, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift TIMES, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift MINUS, reduce by rule 17)
+error:  state 128: shift/reduce conflict (shift PLUS, reduce by rule 17)
+
+state 128:
+
+	exp : FOR ID ASSIGN exp TO exp DO exp .  (reduce by rule 17)
+	arthcomp : exp . PLUS exp 
+	arthcomp : exp . MINUS exp 
+	arthcomp : exp . TIMES exp 
+	arthcomp : exp . DIVIDE exp 
+	logicops : exp . AND exp 
+	logicops : exp . OR exp 
+
+	PLUS	shift 35
+	MINUS	shift 34
+	TIMES	shift 33
+	DIVIDE	shift 32
+	AND	shift 31
+	OR	shift 30
 
 
-state 132:
-
-	looping : FOR ID ASSIGN exp TO exp DO loopexp .  (reduce by rule 40)
+	.	reduce by rule 17
 
 
-
-	.	reduce by rule 40
-
-
-state 133:
+state 129:
 
 	fundec : FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ . exp 
 
@@ -2621,37 +2404,37 @@ state 133:
 	WHILE	shift 19
 	FOR	shift 18
 	LET	shift 17
+	BREAK	shift 16
+	NIL	shift 15
 
-	exp	goto 135
-	lvalue	goto 15
-	vallessexp	goto 14
-	seqs	goto 13
-	literals	goto 12
-	negation	goto 11
-	funcall	goto 10
-	arthcomp	goto 9
-	logicops	goto 8
-	looping	goto 7
+	exp	goto 131
+	lvalue	goto 13
+	vallessexp	goto 12
+	seqs	goto 11
+	negation	goto 10
+	funcall	goto 9
+	arthcomp	goto 8
+	logicops	goto 7
 	recordcreate	goto 6
 	arraycreate	goto 5
 	assign	goto 4
 	ifthen	goto 3
 	letexp	goto 2
-	grp	goto 1
+	unitexp	goto 1
 
 	.	error
 
 
-state 134:
+state 130:
 
-	tyfields : ID COLON ID COMMA tyfields .  (reduce by rule 57)
-
-
-
-	.	reduce by rule 57
+	tyfields : ID COLON ID COMMA tyfields .  (reduce by rule 54)
 
 
-state 135:
+
+	.	reduce by rule 54
+
+
+state 131:
 
 	arthcomp : exp . PLUS exp 
 	arthcomp : exp . MINUS exp 
@@ -2659,7 +2442,7 @@ state 135:
 	arthcomp : exp . DIVIDE exp 
 	logicops : exp . AND exp 
 	logicops : exp . OR exp 
-	fundec : FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp .  (reduce by rule 61)
+	fundec : FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp .  (reduce by rule 58)
 
 	PLUS	shift 35
 	MINUS	shift 34
@@ -2669,10 +2452,10 @@ state 135:
 	OR	shift 30
 
 
-	.	reduce by rule 61
+	.	reduce by rule 58
 
 
-state 136:
+state 132:
 
 
 	EOF	accept
@@ -2680,5 +2463,5 @@ state 136:
 
 	.	error
 
-283 of 687 action table entries left after compaction
-521 goto table entries
+231 of 694 action table entries left after compaction
+442 goto table entries
