@@ -4,6 +4,9 @@ open Symbol
 
 fun simpleVar(id: string, pos: int) = A.SimpleVar((symbol id), pos)
 
+fun negete (exp, pos) =
+    A.OpExp {left = A.IntExp (~1), oper = A.TimesOp, right = exp, pos = pos}
+
 
 %%
 %term
@@ -20,7 +23,8 @@ fun simpleVar(id: string, pos: int) = A.SimpleVar((symbol id), pos)
 
 %nonterm  exp of A.exp | program of A.exp | lvalue of A.var | seqs of A.exp | expseqs of (A.exp * pos) list
         | funcall of A.exp | arthcomp of A.exp | logicops of A.exp| comrcomp of A.exp
-        | args of A.exp list | recordcreate of A.exp | arraycreate of A.exp | recassign of (symbol * A.exp * pos) list
+        | args of A.exp list | non_empty_args of A.exp list
+        | recordcreate of A.exp | arraycreate of A.exp | recassign of (symbol * A.exp * pos) list
         | assign of A.exp | ifthen of A.exp | letexp of A.exp | decs of A.dec list | dec of A.dec
         | tydec of {name: symbol, ty: A.ty, pos: pos}
         | vardec of A.dec
@@ -63,6 +67,7 @@ exp: lvalue                                (A.VarExp lvalue)
    | unitexp                               (unitexp)
    | INT                                   (A.IntExp INT)
    | STRING                                (A.StringExp (STRING, STRINGleft))
+   | MINUS exp  %prec UMINUS               (negete (exp, MINUSleft))
    | funcall                               (funcall)
    | arthcomp                              (arthcomp)
    | comrcomp                              (comrcomp)
@@ -75,23 +80,23 @@ exp: lvalue                                (A.VarExp lvalue)
    | FOR ID ASSIGN exp TO exp DO exp       (A.ForExp {var = (symbol ID), escape = ref true,
                                                       lo = exp1, hi = exp2, body = exp3, pos = FORleft
                                            })
-   | LPAREN exp RPAREN          (exp)
+   | LPAREN expseqs RPAREN     (A.SeqExp(List.rev expseqs))
    | BREAK                      (A.BreakExp BREAKleft)
    | NIL                        (A.NilExp)
    | letexp                     (letexp)
 
-seqs:
-     LPAREN expseqs RPAREN     (A.SeqExp(List.rev expseqs))
 
-expseqs:                        (nil)
-       | expseqs exp SEMICOLON  ((exp, expleft)::expseqs)
-       | expseqs exp            ((exp, expleft)::expseqs)
+expseqs:exp                    ([(exp, expleft)])
+       |expseqs SEMICOLON exp  ((exp, expleft)::expseqs)
+
 
 funcall: ID LPAREN args RPAREN  (A.CallExp {func = (symbol ID), args =  (List.rev args), pos = IDleft})
 
-args: args exp COMMA                   (exp::args)
-    | args exp                         (exp::args)
-    |                                  (nil)
+args: non_empty_args           (non_empty_args)
+    |                          (nil)
+
+non_empty_args: exp                    ([exp])
+    | args COMMA exp                   (exp::args)
 
 
 arthcomp: exp PLUS exp    (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = PLUSleft})
