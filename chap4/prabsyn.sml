@@ -1,4 +1,4 @@
-structure PrintAbsyn : 
+structure PrintAbsyn :
      sig val print : TextIO.outstream * Absyn.exp -> unit end =
 struct
 
@@ -6,7 +6,7 @@ struct
 
 fun print (outstream, e0) =
  let fun say s =  TextIO.output(outstream,s)
-  fun sayln s= (say s; say "\n") 
+  fun sayln s= (say s; say "\n")
 
   fun indent 0 = ()
     | indent i = (say " "; indent(i-1))
@@ -27,7 +27,7 @@ fun print (outstream, e0) =
     | dolist d f nil = ()
 
 
-  fun var(A.SimpleVar(s,p),d) = (indent d; say "SimpleVar("; 
+  fun var(A.SimpleVar(s,p),d) = (indent d; say "SimpleVar(";
 			         say(Symbol.name s); say ")")
     | var(A.FieldVar(v,s,p),d) = (indent d; sayln "FieldVar(";
 				  var(v,d+1); sayln ",";
@@ -48,16 +48,16 @@ fun print (outstream, e0) =
 		(indent d; say "OpExp("; say(opname oper); sayln ",";
 		 exp(left,d+1); sayln ","; exp(right,d+1); say ")")
     | exp(A.RecordExp{fields,typ,pos},d) =
-	    let fun f((name,e,pos),d) = 
+	    let fun f((name,e,pos),d) =
 			(indent d; say "("; say(Symbol.name name);
 			 sayln ","; exp(e,d+1);
 			 say ")")
-	     in indent d; say "RecordExp("; say(Symbol.name typ); 
-	        sayln ",["; dolist d f fields; say "])" 
+	     in indent d; say "RecordExp("; say(Symbol.name typ);
+	        sayln ",["; dolist d f fields; say "])"
 	    end
-    | exp(A.SeqExp l, d) = (indent d; say "SeqExp["; dolist d exp (map #1 l); 
+    | exp(A.SeqExp l, d) = (indent d; say "SeqExp["; dolist d exp (map #1 l);
 			    say "]")
-    | exp(A.AssignExp{var=v,exp=e,pos},d) = 
+    | exp(A.AssignExp{var=v,exp=e,pos},d) =
 		(indent d; sayln "AssignExp("; var(v,d+1); sayln ",";
 		 exp(e,d+1); say ")")
     | exp(A.IfExp{test,then',else',pos},d) =
@@ -83,10 +83,10 @@ fun print (outstream, e0) =
 		 exp(size,d+1); sayln ","; exp(init,d+1); say ")")
 
 
-  and dec(A.FunctionDec l, d) = 
-	    let fun field({name,escape,typ,pos},d) = 
+  and dec(A.FunctionDec l, d) =
+	    let fun field({name,escape,typ,pos},d) =
 			(indent d; say "("; say(Symbol.name name);
-			 say ","; say(Bool.toString(!escape)); 
+			 say ","; say(Bool.toString(!escape));
 			 say ","; say(Symbol.name typ); say ")")
 		fun f({name,params,result,body,pos},d) =
 		   (indent d; say "("; say (Symbol.name name); say ",[";
@@ -99,19 +99,19 @@ fun print (outstream, e0) =
     | dec(A.VarDec{name,escape,typ,init,pos},d) =
 	   (indent d; say "VarDec("; say(Symbol.name name); say ",";
 	    say(Bool.toString (!escape)); say ",";
-	    case typ of NONE => say "NONE" 
+	    case typ of NONE => say "NONE"
 		      | SOME(s,p)=> (say "SOME("; say(Symbol.name s); say ")");
             sayln ","; exp(init,d+1); say ")")
-    | dec(A.TypeDec l, d) = 
-	 let fun tdec({name,ty=t,pos},d) = (indent d; say"("; 
+    | dec(A.TypeDec l, d) =
+	 let fun tdec({name,ty=t,pos},d) = (indent d; say"(";
 				  	    say(Symbol.name name); sayln ",";
 					    ty(t,d+1); say ")")
 	  in indent d; say "TypeDec["; dolist d tdec l; say "]"
          end
-   
+
   and ty(A.NameTy(s,p), d) = (indent d; say "NameTy("; say(Symbol.name s);
 			      say ")")
-    | ty(A.RecordTy l, d) =  
+    | ty(A.RecordTy l, d) =
 		let fun f({name,escape,typ,pos},d) =
 			(indent d; say "("; say (Symbol.name name);
 		         say ","; say (Bool.toString (!escape)); say ",";
@@ -125,4 +125,3 @@ fun print (outstream, e0) =
 end
 
 end
-

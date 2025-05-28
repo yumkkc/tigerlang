@@ -1,19 +1,40 @@
 structure A = Absyn
 
+open Symbol
+
+fun simpleVar(id: string, pos: int) = A.SimpleVar((symbol id), pos)
+
+
 %%
 %term
-    EOF 
+    EOF
   | ID of string
-  | INT of int | STRING of string 
-  | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACK | RBRACK 
-  | LBRACE | RBRACE | DOT 
+  | INT of int | STRING of string
+  | COMMA | COLON | SEMICOLON | LPAREN | RPAREN | LBRACK | RBRACK
+  | LBRACE | RBRACE | DOT
   | PLUS | MINUS | TIMES | DIVIDE | EQ | NEQ | LT | LE | GT | GE
   | AND | OR | ASSIGN
-  | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF 
+  | ARRAY | IF | THEN | ELSE | WHILE | FOR | TO | DO | LET | IN | END | OF
   | BREAK | NIL
-  | FUNCTION | VAR | TYPE 
+  | FUNCTION | VAR | TYPE | UMINUS
 
-%nonterm  exp | program of A.exp
+%nonterm  exp of A.exp | program of A.exp | lvalue of A.var | seqs of A.exp | expseqs of (A.exp * pos) list
+        | funcall of A.exp | arthcomp of A.exp | logicops of A.exp| comrcomp of A.exp
+        | args of A.exp list | recordcreate of A.exp | arraycreate of A.exp | recassign of (symbol * A.exp * pos) list
+        | assign of A.exp | ifthen of A.exp | letexp of A.exp | decs of A.dec list | dec of A.dec
+        | tydec of {name: symbol, ty: A.ty, pos: pos}
+        | vardec of A.dec
+        | fundec of {name: symbol, params: A.field list, result: (symbol * pos) option, body: A.exp, pos:pos}
+        | ty of A.ty | tyfields of A.field list | unitexp of A.exp
+        | fundeclist of A.fundec list | typedeclist of {name: symbol, ty: A.ty, pos: pos} list
+
+
+%nonassoc ASSIGN
+%left AND OR
+%nonassoc EQ NEQ LT LE GT GE
+%left PLUS MINUS
+%left TIMES DIVIDE
+%left UMINUS
 
 %pos int
 %verbose
@@ -23,10 +44,11 @@ structure A = Absyn
 
 %name Tiger
 
-%keyword WHILE FOR TO BREAK LET IN END FUNCTION VAR TYPE ARRAY IF THEN ELSE 
-	DO OF NIL
+%keyword WHILE FOR TO BREAK LET IN END FUNCTION VAR TYPE ARRAY IF THEN ELSE DO OF NIL
 
 %prefer THEN ELSE LPAREN
+
+
 
 %value ID ("bogus")
 %value INT (1)
@@ -34,7 +56,121 @@ structure A = Absyn
 
 %%
 
-program	: exp				(exp)
+program: exp (exp)
 
-	
-exp: NIL		(A.NilExp)
+exp: lvalue                                (A.VarExp lvalue)
+   | seqs                                  (seqs)
+   | unitexp                               (unitexp)
+   | INT                                   (A.IntExp INT)
+   | STRING                                (A.StringExp (STRING, STRINGleft))
+   | funcall                               (funcall)
+   | arthcomp                              (arthcomp)
+   | comrcomp                              (comrcomp)
+   | logicops                              (logicops)
+   | recordcreate                          (recordcreate)
+   | arraycreate                           (arraycreate)
+   | assign                                (assign)
+   | ifthen                                (ifthen)
+   | WHILE exp DO exp                      (A.WhileExp {test = exp1, body = exp2, pos = WHILEleft})
+   | FOR ID ASSIGN exp TO exp DO exp       (A.ForExp {var = (symbol ID), escape = ref true,
+                                                      lo = exp1, hi = exp2, body = exp3, pos = FORleft
+                                           })
+   | LPAREN exp RPAREN          (exp)
+   | BREAK                      (A.BreakExp BREAKleft)
+   | NIL                        (A.NilExp)
+   | letexp                     (letexp)
+
+seqs:
+     LPAREN expseqs RPAREN     (A.SeqExp(List.rev expseqs))
+
+expseqs:                        (nil)
+       | expseqs exp SEMICOLON  ((exp, expleft)::expseqs)
+       | expseqs exp            ((exp, expleft)::expseqs)
+
+funcall: ID LPAREN args RPAREN  (A.CallExp {func = (symbol ID), args =  (List.rev args), pos = IDleft})
+
+args: args exp COMMA                   (exp::args)
+    | args exp                         (exp::args)
+    |                                  (nil)
+
+
+arthcomp: exp PLUS exp    (A.OpExp {left = exp1, oper = A.PlusOp, right = exp2, pos = PLUSleft})
+        | exp MINUS exp   (A.OpExp {left = exp1, oper = A.MinusOp, right = exp2, pos = MINUSleft})
+        | exp TIMES exp   (A.OpExp {left = exp1, oper = A.TimesOp, right = exp2, pos = TIMESleft})
+        | exp DIVIDE exp  (A.OpExp {left = exp1, oper = A.DivideOp, right = exp2, pos = DIVIDEleft})
+
+logicops: exp AND exp     (A.IfExp {test = exp1, then' = exp2, else' = SOME (A.IntExp 1) , pos = ANDleft})
+        | exp OR exp      (A.IfExp {test = exp1, then' = A.IntExp(1), else' = SOME exp2 , pos = ORleft})
+
+comrcomp:
+          exp EQ exp    (A.OpExp {left = exp1, oper = A.EqOp, right = exp2, pos = EQleft})
+        | exp NEQ exp   (A.OpExp {left = exp1, oper = A.NeqOp, right = exp2, pos = NEQleft})
+        | exp LT exp    (A.OpExp {left = exp1, oper = A.LtOp, right = exp2, pos = LTleft})
+        | exp LE exp    (A.OpExp {left = exp1, oper = A.LeOp, right = exp2, pos = LEleft})
+        | exp GT exp    (A.OpExp {left = exp1, oper = A.GtOp, right = exp2, pos = GTleft})
+        | exp GE exp    (A.OpExp {left = exp1, oper = A.GeOp, right = exp2, pos = GEleft})
+
+
+recordcreate: ID LBRACE recassign RBRACE (A.RecordExp {fields = (List.rev recassign), typ = (symbol ID), pos = LBRACEleft})
+
+recassign:                                      (nil)
+         | recassign ID EQ exp                  (((symbol ID), exp, IDleft)::recassign)
+         | recassign ID EQ exp COMMA            (((symbol ID), exp, IDleft)::recassign)
+
+
+
+arraycreate: ID LBRACK exp RBRACK OF exp    (A.ArrayExp {typ = (symbol ID), size = exp1, init = exp2, pos = IDleft})
+
+assign: lvalue ASSIGN exp             (A.AssignExp {var = lvalue, exp = exp, pos = ASSIGNleft})
+
+ifthen : IF exp THEN exp ELSE exp     (A.IfExp {test = exp1, then' = exp2, else' = (SOME exp3), pos = IFleft })
+       | IF exp THEN exp              (A.IfExp {test = exp1, then' = exp2, else' = (SOME (A.IntExp 0)), pos = IFleft })
+
+
+letexp: LET decs IN expseqs END    (A.LetExp {decs = decs, body = A.SeqExp(List.rev expseqs), pos = LETleft})
+
+decs: dec decs                     (dec::decs)
+    |                              (nil)
+
+dec: typedeclist         (A.TypeDec typedeclist)
+   | vardec             (vardec)
+   | fundeclist         (A.FunctionDec fundeclist)
+
+typedeclist: tydec ([tydec])
+           | typedeclist tydec ([tydec] @ typedeclist)
+
+fundeclist: fundec            (fundec::nil)
+          | fundeclist fundec (fundec::fundeclist)
+
+tydec: TYPE ID EQ ty               ({name = symbol ID, ty = ty, pos = TYPEleft})
+
+ty: ID                             (A.NameTy (symbol ID, IDleft))
+  | LBRACE tyfields RBRACE         (A.RecordTy tyfields)
+  | ARRAY OF ID                    (A.ArrayTy (symbol ID, ARRAYleft))
+
+
+tyfields:                                   (nil)
+        | ID COLON ID                       ({name = symbol ID1, escape = ref true, typ = symbol ID2, pos = COLONleft}::nil)
+        | ID COLON ID COMMA tyfields        ({name = symbol ID1, escape =  ref true, typ = symbol ID2, pos = COLONleft}::tyfields)
+
+
+vardec: VAR ID ASSIGN exp                    (A.VarDec {name = symbol ID, escape = ref true, typ = NONE, init = exp, pos=VARleft})
+      | VAR ID COLON ID ASSIGN exp           (A.VarDec {name = symbol ID1, escape = ref true,
+                                                        typ = SOME (symbol ID2, ID2left),
+                                                        init = exp, pos=VARleft})
+
+
+fundec: FUNCTION ID LPAREN tyfields RPAREN EQ exp             ({name = symbol ID, params = tyfields, result=NONE,
+                                                                body=exp,pos=FUNCTIONleft})
+      | FUNCTION ID LPAREN tyfields RPAREN COLON ID EQ exp    ({name = symbol ID1, params = tyfields,
+                                                                result=SOME (symbol ID2, ID2left),
+                                                                body=exp,pos=FUNCTIONleft})
+
+
+lvalue: ID                                           (A.SimpleVar((symbol ID), IDleft))
+      | lvalue LBRACK exp RBRACK                     (A.SubscriptVar(lvalue, exp, lvalueleft))
+      | ID LBRACK exp RBRACK                         (A.SubscriptVar(simpleVar(ID, IDleft), exp, IDleft))
+      | lvalue DOT ID                                (A.FieldVar(lvalue, (symbol ID), lvalueleft))
+
+
+unitexp: LPAREN RPAREN (A.NilExp)
