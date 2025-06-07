@@ -212,7 +212,7 @@ fun transExp (venv, tenv, exp) =
                    let
                        fun check_type_param (formal::formals, arg::args) =
                            let val {exp=_, ty=t'} = trexp arg
-                           in if not (formal = t') then
+                           in if not (actual_ty formal = actual_ty t') then
                                   ((ErrorMsg.error pos "type does not match");
                                        false andalso check_type_param (formals, args))
                               else true andalso check_type_param (formals, args)
@@ -328,7 +328,7 @@ and transDecs (venv, tenv, dec::decs) =
 
                              in
                                 check_type_equality(ty, res_ty, pos,
-                                        ("result type of " ^ Symbol.name name ^ " and " ^ Symbol.name sym_ty ^ " does not matcgh"));
+                                        ("result type of " ^ Symbol.name name ^ " and " ^ Symbol.name sym_ty ^ " does not match"));
                                  {tenv = tenv, venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty})}
                              end
              )
@@ -336,16 +336,37 @@ and transDecs (venv, tenv, dec::decs) =
                 {venv=venv, tenv=tenv})
           )
 
-          | transDec  (venv, tenv, A.TypeDec declrs) =
-            let fun loop (tenv, ({name, ty, pos}::rest)) =
-                let
-                    val tenv' = Symbol.enter (tenv, name, transTy(tenv, ty))
-                in
-                    loop (tenv', rest)
-                end
-                  | loop  (tenv, []) = {venv=venv, tenv=tenv}
+          | transDec (venv, tenv, A.TypeDec declars) =
+            let
+                fun iterate_decs (venv, tenv) =
+                    let
+                        fun iterate_dec {name, ty, pos} =
+                            let
+                                fun look_type (tenv, name, pos) =
+                                    case Symbol.look(tenv, name) of
+                                        SOME ty => ty
+                                      | NONE => ((ErrorMsg.error pos ("type variable not found " ^ Symbol.name name)); Types.NIL)
+
+                                val Types.NAME(nameRef, typRef) = look_type (tenv, name, pos)
+                                val replace_ty = case ty
+                                                  of A.NameTy (sym, pos) =>
+                                                               Types.NAME (sym, ref (SOME(look_type(tenv, sym, pos))))
+                                                   | A.ArrayTy (sym, pos) =>
+                                                               Types.ARRAY (look_type(tenv, name, pos), ref ())
+                                                   | A.RecordTy fields =>
+                                                               Types.RECORD (map (fn ({name, escape, typ, pos}) =>
+                                                                                               (name, look_type (tenv, typ, pos))) fields, ref())
+                            in
+                                typRef := SOME(replace_ty)
+                            end
+                    in
+                        app iterate_dec declars
+                    end
+                fun initialize ({name, ty, pos}, tenv) = Symbol.enter (tenv, name, Types.NAME(name, ref NONE))
+                val tenv' = foldr initialize tenv declars
             in
-                loop (tenv, declrs)
+                iterate_decs (venv, tenv');
+                {tenv=tenv', venv=venv}
             end
 
           | transDec  (venv, tenv,
@@ -355,7 +376,7 @@ and transDecs (venv, tenv, dec::decs) =
               let
                   val result_ty = case result of
                                       SOME (rt, pos) => (case Symbol.look(tenv, rt) of
-                                                      SOME ty => ty
+                                                      SOME ty => actual_ty ty
                                                     | NONE => (ErrorMsg.error pos (Symbol.name rt ^ "Result type not found");
                                                                 Types.UNIT)
                                                  )
@@ -369,7 +390,7 @@ and transDecs (venv, tenv, dec::decs) =
                         val venv'' = foldl enterparam venv' params'
                         val {exp=_, ty=bodyty} = transExp (venv'', tenv, body)
                     in
-                        (check_type_equality (result_ty, bodyty, pos, "Result type does not match return of expression"));
+                        (check_type_equality (result_ty, bodyty, pos, (Symbol.name name ^ " function result type does not match return of expression")));
                             transDec (venv', tenv, A.FunctionDec rest)
                     end
               end

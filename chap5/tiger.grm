@@ -142,7 +142,7 @@ dec: typedeclist         (A.TypeDec typedeclist)
    | fundeclist         (A.FunctionDec fundeclist)
 
 typedeclist: tydec ([tydec])
-           | typedeclist tydec ([tydec] @ typedeclist)
+           | typedeclist tydec (typedeclist @ [tydec])
 
 fundeclist: fundec            (fundec::nil)
           | fundeclist fundec (fundec::fundeclist)

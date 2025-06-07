@@ -1,5 +1,7 @@
 let
-function f(a: int, b:string) = (b;())
+type b = a
+type a = int
+function test (u:b): b = u
 in
-f(1, "sd")
+test (2)
 end

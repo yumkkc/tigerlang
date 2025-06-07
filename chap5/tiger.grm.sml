@@ -1187,7 +1187,7 @@ MlyValue.typedeclist typedeclist1, typedeclist1left, _)) :: rest671))
  => let val  result = MlyValue.typedeclist (fn _ => let val  (
 typedeclist as typedeclist1) = typedeclist1 ()
  val  (tydec as tydec1) = tydec1 ()
- in ([tydec] @ typedeclist)
+ in (typedeclist @ [tydec])
 end)
  in ( LrTable.NT 26, ( result, typedeclist1left, tydec1right), rest671
 )
