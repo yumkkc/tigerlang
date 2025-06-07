@@ -338,6 +338,13 @@ and transDecs (venv, tenv, dec::decs) =
 
           | transDec (venv, tenv, A.TypeDec declars) =
             let
+                fun cycle_check (pos, sym, SOME(Types.NAME (sym2, tyref))) =
+                    if (sym2 = sym) then ((ErrorMsg.error pos "cycle detected in declaration"); true)
+                    else cycle_check (pos, sym, !tyref)
+
+                  | cycle_check _ = false
+
+
                 fun iterate_decs (venv, tenv) =
                     let
                         fun iterate_dec {name, ty, pos} =
@@ -350,7 +357,9 @@ and transDecs (venv, tenv, dec::decs) =
                                 val Types.NAME(nameRef, typRef) = look_type (tenv, name, pos)
                                 val replace_ty = case ty
                                                   of A.NameTy (sym, pos) =>
+                                                               if not (cycle_check (pos,name, SOME(look_type(tenv,sym,pos)))) then
                                                                Types.NAME (sym, ref (SOME(look_type(tenv, sym, pos))))
+                                                               else Types.NIL
                                                    | A.ArrayTy (sym, pos) =>
                                                                Types.ARRAY (look_type(tenv, name, pos), ref ())
                                                    | A.RecordTy fields =>
