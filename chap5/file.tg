@@ -1,0 +1,5 @@
+let
+function f(a: int, b:string) = (b;())
+in
+f(1, "sd")
+end
