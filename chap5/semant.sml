@@ -11,7 +11,7 @@ sig
 (*    val transVar: venv * tenv * Abysn.dec -> expty *)
     val transDecs: venv * tenv * Absyn.dec list -> {venv: venv, tenv: tenv}
     val transTy : tenv * Absyn.ty -> Types.ty
-    val transProg: venv * tenv * Absyn.exp -> expty
+    val transProg: Absyn.exp -> expty
 end
 
 structure Semant : SEMANT =
@@ -404,5 +404,5 @@ and transTy (tenv, ty) =
         trTy ty
     end
 
-and transProg (venv, tenv, exp) = transExp (venv, tenv, exp)
+and transProg exp = transExp (Env.base_venv, Env.base_tenv, exp)
 end
