@@ -1,7 +1,9 @@
+/* arr1 is valid since expression 0 is int = myint */
 let
-type a = b
-type b = int
-function test (v: a): a = v
+	type myint = int
+	type  arrtype = array of myint
+
+	var arr1:arrtype := arrtype [10] of 0
 in
-2
+	arr1
 end

@@ -21,7 +21,7 @@ fun negete (exp, pos) =
   | BREAK | NIL
   | FUNCTION | VAR | TYPE | UMINUS
 
-%nonterm  exp of A.exp | program of A.exp | lvalue of A.var | seqs of A.exp | expseqs of (A.exp * pos) list
+%nonterm  exp of A.exp | program of A.exp | lvalue of A.var | expseqs of (A.exp * pos) list
         | funcall of A.exp | arthcomp of A.exp | logicops of A.exp| comrcomp of A.exp
         | args of A.exp list | non_empty_args of A.exp list
         | recordcreate of A.exp | arraycreate of A.exp | recassign of (symbol * A.exp * pos) list
@@ -63,7 +63,6 @@ fun negete (exp, pos) =
 program: exp (exp)
 
 exp: lvalue                                (A.VarExp lvalue)
-   | seqs                                  (seqs)
    | unitexp                               (unitexp)
    | INT                                   (A.IntExp INT)
    | STRING                                (A.StringExp (STRING, STRINGleft))

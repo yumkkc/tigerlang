@@ -35,10 +35,18 @@ fun checkInt ({exp, ty}, pos) = if ty = Types.INT then true else
 fun checkUnit ({exp = _, ty=Types.UNIT}, pos) = ()
   | checkUnit (_, pos) = ErrorMsg.error pos ("unit required")
 
-fun actual_ty (Types.NAME (s, tyref)) = (case !tyref of
+fun lookupActualType(pos, tenv, ty) =
+    case Symbol.look(tenv, ty)
+     of SOME ty => actual_ty ty
+      | NONE => (ErrorMsg.error pos ("Type '" ^ Symbol.name ty ^ "' is not defined"); Types.NIL)
+
+and
+
+ actual_ty (Types.NAME (s, tyref)) = (case !tyref of
                                       SOME t => actual_ty t
                                     | NONE => Types.NIL)
   | actual_ty t = t
+
 
 fun find_type (tenv, sym, pos) =
     let
@@ -53,9 +61,25 @@ fun find_type (tenv, sym, pos) =
 fun is_list_size_eq (a, b) = length a = length b
 
 fun check_type_equality (ty1: Types.ty, ty2: Types.ty, pos, errormsg) =
-    case (actual_ty ty1 = actual_ty ty2) of
-        true => ()
-      | false =>  (ErrorMsg.error pos errormsg)
+    let
+        fun types_equal (Types.INT, Types.INT) = true
+          | types_equal (Types.STRING, Types.STRING) = true
+          | types_equal (Types.UNIT, Types.UNIT) = true
+          | types_equal (Types.NIL, Types.NIL) = true
+          | types_equal (Types.ARRAY (t1, _), Types.ARRAY(t2, _)) =
+            types_equal (actual_ty t1, actual_ty t2)
+          | types_equal (Types.RECORD (fields1, _), Types.RECORD(fields2, _)) =
+            length fields1 = length fields2 andalso
+                        List.all (fn ((name1, ty1), (name2, ty2)) =>
+                         name1 = name2 andalso types_equal (actual_ty ty1, actual_ty ty2))
+                       (ListPair.zip (fields1, fields2))
+          | types_equal (Types.NAME (s1, _), Types.NAME (s2, _)) = s1=s2
+          | types_equal (ty1, ty2) = false
+    in
+        case types_equal (actual_ty ty1, actual_ty ty2) of
+            true => ()
+          | false => ErrorMsg.error pos errormsg
+    end
 
 
 fun enterparam ({name, ty}, venv) =
@@ -169,13 +193,13 @@ fun transExp (venv, tenv, exp, context: context) =
           )
 
           | trexp (A.ArrayExp {typ, size, init, pos}) = (
-            case (Symbol.look (tenv, typ)) of
-                SOME (Types.ARRAY (arr_ty, _)) => (
-                case trexp exp of
+            case lookupActualType(pos, tenv, typ) of
+                Types.ARRAY (arr_ty, _) => (
+                 case trexp size of
                     {exp = _, ty=Types.INT} => (
                               let val {exp = (), ty = init_ty} = trexp init
                               in
-                                  if (init_ty = arr_ty)
+                                  if (actual_ty init_ty = actual_ty arr_ty)
                                   then {exp = (), ty=(Types.ARRAY (arr_ty, ref ()))}
                                   else ((ErrorMsg.error pos (Symbol.name typ ^ " does not match the type of initialization"));
                                             {exp = (), ty=Types.NIL})
@@ -192,7 +216,7 @@ fun transExp (venv, tenv, exp, context: context) =
                   val {exp=_, ty=var_ty} = trvar var
                   val {exp=_, ty=exp_ty} = trexp exp
             in
-                if (var_ty = exp_ty) then {exp=(), ty = var_ty} else
+                if (var_ty = exp_ty) then {exp=(), ty = Types.UNIT} else
                 ((ErrorMsg.error pos ("type is assign statement does not match"));
                      {exp=(), ty = Types.NIL})
             end
@@ -324,8 +348,6 @@ and transDecs (venv, tenv, dec::decs) =
                 SOME(res_ty) => (
                              let
                                  val {exp, ty} = transExp(venv, tenv, init, NOTLOOP)
-
-
                              in
                                 check_type_equality(ty, res_ty, pos,
                                         ("result type of " ^ Symbol.name name ^ " and " ^ Symbol.name sym_ty ^ " does not match"));
@@ -361,7 +383,7 @@ and transDecs (venv, tenv, dec::decs) =
                                                                Types.NAME (sym, ref (SOME(look_type(tenv, sym, pos))))
                                                                else Types.NIL
                                                    | A.ArrayTy (sym, pos) =>
-                                                               Types.ARRAY (look_type(tenv, name, pos), ref ())
+                                                               Types.ARRAY (look_type(tenv, sym, pos), ref ())
                                                    | A.RecordTy fields =>
                                                                Types.RECORD (map (fn ({name, escape, typ, pos}) =>
                                                                                                (name, look_type (tenv, typ, pos))) fields, ref())
