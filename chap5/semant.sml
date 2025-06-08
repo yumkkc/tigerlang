@@ -4,10 +4,11 @@ signature SEMANT =
 sig
     type venv = Env.enventry Symbol.table
     type tenv = Types.ty Symbol.table
+    datatype context = LOOP | NOTLOOP
 
     type expty = {exp: Translate.exp, ty: Types.ty}
 
-    val transExp: venv * tenv * Absyn.exp -> expty
+    val transExp: venv * tenv * Absyn.exp * context  -> expty
 (*    val transVar: venv * tenv * Abysn.dec -> expty *)
     val transDecs: venv * tenv * Absyn.dec list -> {venv: venv, tenv: tenv}
     val transTy : tenv * Absyn.ty -> Types.ty
@@ -61,9 +62,11 @@ fun enterparam ({name, ty}, venv) =
                     Symbol.enter (venv, name,
                         Env.VarEntry {ty=ty})
 
+datatype context = LOOP | NOTLOOP
+
 
 (* Absyn.exp *)
-fun transExp (venv, tenv, exp) =
+fun transExp (venv, tenv, exp, context: context) =
     let
 
         fun check_arth_param (left, right, pos) =
@@ -132,9 +135,14 @@ fun transExp (venv, tenv, exp) =
           | trexp (A.LetExp {decs, body, pos}) =
             (
               let val {venv=venv', tenv=tenv'} = transDecs(venv, tenv, decs)
-              in transExp (venv', tenv', body)
+              in transExp (venv', tenv', body, NOTLOOP)
               end
             )
+
+          | trexp (A.BreakExp pos) = (case context of
+                                     NOTLOOP => ((ErrorMsg.error pos "break statment not allowed here"); {exp=(), ty=Types.UNIT})
+                                   | LOOP => {exp =(), ty=Types.UNIT}
+                                 )
 
           | trexp (A.RecordExp {fields, typ, pos}) = (
             case Symbol.look (tenv, typ) of
@@ -247,7 +255,7 @@ fun transExp (venv, tenv, exp) =
 
           | trexp (A.WhileExp {test, body, pos}) =
             let val test_ty = trexp test
-                val body_ty = trexp body
+                val body_ty = transExp (venv, tenv, body, LOOP)
             in
                 checkInt (test_ty, pos);
                 checkUnit (body_ty, pos);
@@ -259,15 +267,13 @@ fun transExp (venv, tenv, exp) =
                 val lo_ty = trexp lo
                 val hi_ty = trexp hi
                 val venv' = Symbol.enter (venv, var, (Env.VarEntry {ty=Types.INT}))
-                val body_ty = transExp (venv', tenv, body)
+                val body_ty = transExp (venv', tenv, body, LOOP)
             in
                 checkInt(lo_ty, pos);
                 checkInt (hi_ty, pos);
                 checkUnit (body_ty, pos);
                 {exp = (), ty=Types.UNIT}
             end
-
-          | trexp  _ =    {exp = (), ty=Types.NIL} (* TODO *)
 
         and trvar (A.SimpleVar (id, pos)) =
             (case Symbol.look(venv, id)
@@ -307,7 +313,7 @@ fun transExp (venv, tenv, exp) =
 and transDecs (venv, tenv, dec::decs) =
     let
         fun transDec (venv, tenv, A.VarDec {name, typ=NONE, init, ...}) =
-            let val {exp, ty} = transExp(venv, tenv, init)
+            let val {exp, ty} = transExp(venv, tenv, init, NOTLOOP)
             in {tenv = tenv, venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty})}
             end
 
@@ -317,7 +323,7 @@ and transDecs (venv, tenv, dec::decs) =
             case Symbol.look (tenv, sym_ty) of
                 SOME(res_ty) => (
                              let
-                                 val {exp, ty} = transExp(venv, tenv, init)
+                                 val {exp, ty} = transExp(venv, tenv, init, NOTLOOP)
 
 
                              in
@@ -400,7 +406,7 @@ and transDecs (venv, tenv, dec::decs) =
                                 val result_ty = look_result_type (tenv, result)
                                 val params' = map (transparam tenv) params
                                 val venv'' = foldl enterparam venv params'
-                                val {exp=_, ty=bodyty} = transExp (venv'', tenv, body)
+                                val {exp=_, ty=bodyty} = transExp (venv'', tenv, body, NOTLOOP)
                             in
                                 (check_type_equality (result_ty, bodyty, pos, (Symbol.name name ^ " function result type does not match return of expression")))
                             end
@@ -449,5 +455,5 @@ and transTy (tenv, ty) =
         trTy ty
     end
 
-and transProg exp = transExp (Env.base_venv, Env.base_tenv, exp)
+and transProg exp = transExp (Env.base_venv, Env.base_tenv, exp, NOTLOOP)
 end

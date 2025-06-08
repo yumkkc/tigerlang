@@ -1,8 +1,7 @@
 let
 type a = b
-type b = c
-type c = a
-function test (b:b):b = b
+type b = int
+function test (v: a): a = v
 in
 2
 end
