@@ -52,16 +52,10 @@ fun find_type (tenv, sym, pos) =
 fun is_list_size_eq (a, b) = length a = length b
 
 fun check_type_equality (ty1: Types.ty, ty2: Types.ty, pos, errormsg) =
-    case (ty1 = ty2) of
+    case (actual_ty ty1 = actual_ty ty2) of
         true => ()
       | false =>  (ErrorMsg.error pos errormsg)
 
-fun transparam tenv {name, typ, pos, escape} = (
-                    case Symbol.look(tenv, typ) of
-                                SOME t => {name=name, ty=t}
-                                  | NONE => ((ErrorMsg.error pos (Symbol.name typ ^ " type not found"));
-                                                         {name=name, ty=Types.NIL})
-        )
 
 fun enterparam ({name, ty}, venv) =
                     Symbol.enter (venv, name,
@@ -339,7 +333,7 @@ and transDecs (venv, tenv, dec::decs) =
           | transDec (venv, tenv, A.TypeDec declars) =
             let
                 fun cycle_check (pos, sym, SOME(Types.NAME (sym2, tyref))) =
-                    if (sym2 = sym) then ((ErrorMsg.error pos "cycle detected in declaration"); true)
+                    if (sym2 = sym) then ((ErrorMsg.error pos ("Illegal cycle detected in type " ^ Symbol.name sym)); true)
                     else cycle_check (pos, sym, !tyref)
 
                   | cycle_check _ = false
@@ -378,34 +372,55 @@ and transDecs (venv, tenv, dec::decs) =
                 {tenv=tenv', venv=venv}
             end
 
-          | transDec  (venv, tenv,
-                      A.FunctionDec ({name, params, body, pos,
-                      result}::rest)) = (
+          | transDec (venv, tenv, A.FunctionDec fundecs) =
+            let
+                fun look_result_type (tenv, result) =
+                    case result of
+                        SOME (rt, pos) => (case Symbol.look(tenv, rt) of
+                                               SOME ty => actual_ty ty
+                                             | NONE => (ErrorMsg.error pos (Symbol.name rt ^ "Result type not found");
+                                                        Types.UNIT)
+                                          )
+                      | NONE => Types.UNIT
 
-              let
-                  val result_ty = case result of
-                                      SOME (rt, pos) => (case Symbol.look(tenv, rt) of
-                                                      SOME ty => actual_ty ty
-                                                    | NONE => (ErrorMsg.error pos (Symbol.name rt ^ "Result type not found");
-                                                                Types.UNIT)
-                                                 )
-                                   | NONE => Types.UNIT
-              in
+                fun transparam tenv {name, typ, pos, escape} =
+                    case Symbol.look(tenv, typ) of
+                        SOME t => {name=name, ty=t}
+                      | NONE => ((ErrorMsg.error pos (Symbol.name typ ^ " type not found"));
+                                 {name=name, ty=Types.NIL})
+
+                fun updateBodys(venv, tenv) =
                     let
-                        val params' = map (transparam tenv) params
-                        val venv' = Symbol.enter (venv, name,
-                                                  E.FunEntry {formals = map #ty params',
-                                                                            result=result_ty})
-                        val venv'' = foldl enterparam venv' params'
-                        val {exp=_, ty=bodyty} = transExp (venv'', tenv, body)
-                    in
-                        (check_type_equality (result_ty, bodyty, pos, (Symbol.name name ^ " function result type does not match return of expression")));
-                            transDec (venv', tenv, A.FunctionDec rest)
-                    end
-              end
-          )
+                        fun enterparam ({name, ty}, venv) =
+                            Symbol.enter (venv, name,
+                                          Env.VarEntry {ty=ty})
 
-          | transDec (venv, tenv, A.FunctionDec []) = {venv=venv, tenv=tenv}
+                        fun updateBody({name, params, body, pos, result}) =
+                            let
+                                val result_ty = look_result_type (tenv, result)
+                                val params' = map (transparam tenv) params
+                                val venv'' = foldl enterparam venv params'
+                                val {exp=_, ty=bodyty} = transExp (venv'', tenv, body)
+                            in
+                                (check_type_equality (result_ty, bodyty, pos, (Symbol.name name ^ " function result type does not match return of expression")))
+                            end
+                    in
+                        app updateBody fundecs
+                    end
+                (* initial function headers insertion -> {venv', tenv'}*)
+                fun enterFunctionHeaders({name, params, body, pos, result}, {venv, tenv}) =
+                    let
+                        val result_ty = look_result_type (tenv, result)
+                        val params' = map (transparam tenv) params
+                        val venv' = Symbol.enter (venv, name, E.FunEntry {formals = map #ty params', result=result_ty})
+                    in
+                        {venv=venv', tenv=tenv}
+                    end
+                val {venv=venv', tenv=tenv'} = foldl enterFunctionHeaders {venv=venv,tenv=tenv} fundecs
+            in
+                updateBodys(venv', tenv');
+                {venv=venv', tenv=tenv'}
+            end
 
         val {venv=venv', tenv=tenv'} = transDec (venv, tenv, dec)
     in
