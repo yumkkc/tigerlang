@@ -2,8 +2,11 @@ signature ENV =
 sig
     type access
     type ty
-    datatype enventry = VarEntry of {ty : ty}
-           | FunEntry of {formals: ty list, result: ty}
+    datatype enventry = VarEntry of {ty : ty, access: Translate.access}
+           | FunEntry of {label: Temp.label,
+                          level: Translate.level,
+                          formals: ty list,
+                          result: ty}
 
     type tenv = ty Symbol.table
     type venv = enventry Symbol.table
@@ -20,8 +23,12 @@ type ty = Types.ty
 
 structure T = Types
 
-datatype enventry = VarEntry of {ty : ty}
-                  | FunEntry of {formals: ty list, result: ty}
+datatype enventry = VarEntry of {ty : ty, access: Translate.access}
+                  | FunEntry of {
+                      label: Temp.label,
+                      level: Translate.level,
+                      formals: ty list,
+                      result: ty}
 
 type tenv = ty Symbol.table
 type venv = enventry Symbol.table

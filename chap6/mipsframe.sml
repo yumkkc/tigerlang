@@ -1,8 +1,13 @@
 structure MipsFrame : FRAME = struct
 
+(* determines where the value will be stored -> register (temp) or memory (int) *)
 datatype access = InFrame of int | InReg of Temp.temp
 
-type frame = { name: Temp.label, formals: (access * bool) list, locals: (access * bool) list ref }
+(* label here is memory label which starts the location *)
+type frame = { name: Temp.label,
+               formals: (access * bool) list,
+               locals: (access * bool) list ref
+             }
 
 fun assignMem() = InFrame 0 (* TODO: Change later *)
 
@@ -23,10 +28,10 @@ fun formals {name=name, formals=formals, locals=_} =
 fun allocLocal {name, formals, locals} isescape =
     let
         val new_access = assignMemOrReg isescape
+        val (access, _) = new_access
     in
         locals := new_access :: !locals;
-        #1 new_access
+        access
     end
 
-    
 end

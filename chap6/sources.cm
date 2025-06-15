@@ -1,5 +1,4 @@
 Group is 
-
 absyn.sml
 errormsg.sml
 table.sig
@@ -16,6 +15,8 @@ main.sml
 temp.sig
 temp.sml
 frame.sig
+mipsframe.sml
+translate.sml
 $/basis.cm
 $/smlnj-lib.cm
 $/ml-yacc-lib.cm
