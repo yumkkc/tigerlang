@@ -6,4 +6,9 @@ Modern compiler Implementation in ML by Andrew Appel
 
 - [x] Chapter 1: Introduction 
 - [x] Chapter 2: Lexical Analysis 
-- [ ] Chapter 3: Parsing
+- [x] Chapter 3: Parsing
+- [x] Chapter 4
+- [x] Chapter 5
+- [x] Chapter 6
+- [ ] Chapter 7
+
