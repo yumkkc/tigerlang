@@ -286,7 +286,7 @@ fun transExp (level, venv, tenv, exp, context: context) =
             let
                 val lo_ty = trexp lo
                 val hi_ty = trexp hi
-                val access' = T.allocLocal level true
+                val access' = T.allocLocal level (!escape)
                 val venv' = Symbol.enter (venv, var, (Env.VarEntry {ty=Types.INT, access=access'})) (* TODO *)
                 val body_ty = transExp (level, venv', tenv, body, LOOP)
             in
@@ -333,20 +333,20 @@ fun transExp (level, venv, tenv, exp, context: context) =
 (* Absyn.dec *)
 and transDecs (level, venv, tenv, dec::decs) =
     let
-        fun transDec (venv, tenv, A.VarDec {name, typ=NONE, init, ...}) =
+        fun transDec (venv, tenv, A.VarDec {name, typ=NONE, init, escape, pos}) =
             let val {exp, ty} = transExp(level, venv, tenv, init, NOTLOOP)
-                val access' = T.allocLocal level true (* TODO: Change the escape *)
+                val access' = T.allocLocal level (!escape)
             in {tenv = tenv, venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty, access=access'})}
             end
 
          (* TODO: some more changes are required -> if type failed to add or not *)
 
-          | transDec (venv, tenv, A.VarDec {name, typ=SOME(sym_ty, sym_pos), pos, init, ...}) = (
+          | transDec (venv, tenv, A.VarDec {name, typ=SOME(sym_ty, sym_pos), pos, init, escape}) = (
             case Symbol.look (tenv, sym_ty) of
                 SOME(res_ty) => (
                              let
                                  val {exp, ty} = transExp(level, venv, tenv, init, NOTLOOP)
-                                 val access' = T.allocLocal level true (* TODO: Change the escape *)
+                                 val access' = T.allocLocal level (!escape)
                              in
                                 check_type_equality(ty, res_ty, pos,
                                         ("result type of " ^ Symbol.name name ^ " and " ^ Symbol.name sym_ty ^ " does not match"));
@@ -412,16 +412,16 @@ and transDecs (level, venv, tenv, dec::decs) =
 
                 fun transparam tenv {name, typ, pos, escape} =
                     case Symbol.look(tenv, typ) of
-                        SOME t => {name=name, ty=t}
+                        SOME t => {name=name, ty=t, escape=escape}
                       | NONE => ((ErrorMsg.error pos (Symbol.name typ ^ " type not found"));
-                                 {name=name, ty=Types.NIL})
+                                 {name=name, ty=Types.NIL, escape=escape})
 
                 fun updateBodys(venv, tenv) =
                     let
-                        fun enterparam ({name, ty}, venv) =
+                        fun enter_local_vars ({name, ty, escape}, venv) =
                             (* TODO: Change this for different levels *)
                             let
-                                val access' = T.allocLocal level true
+                                val access' = T.allocLocal level (!escape)
                             in
                                 Symbol.enter (venv, name,
                                               Env.VarEntry {ty=ty, access=access'})
@@ -432,7 +432,7 @@ and transDecs (level, venv, tenv, dec::decs) =
                             let
                                 val result_ty = look_result_type (tenv, result)
                                 val params' = map (transparam tenv) params
-                                val venv'' = foldl enterparam venv params'
+                                val venv'' = foldl enter_local_vars venv params'
                                 val {exp=_, ty=bodyty} = transExp (level, venv'', tenv, body, NOTLOOP)
                             in
                                 (check_type_equality (result_ty, bodyty, pos, (Symbol.name name ^ " function result type does not match return of expression")))
@@ -446,7 +446,7 @@ and transDecs (level, venv, tenv, dec::decs) =
                         val result_ty = look_result_type (tenv, result)
                         val params' = map (transparam tenv) params
                         val fun_label = Temp.newlabel()
-                        val new_level = T.newLevel {parent=level, name=fun_label, formals=[true, true, true]}
+                        val new_level = T.newLevel {parent=level, name=fun_label, formals= map (! o #escape) params'}
                         val venv' = Symbol.enter (venv, name, E.FunEntry {formals = map #ty params',
                                                                           result=result_ty, level=new_level, label=fun_label})
                     in
