@@ -10,7 +10,7 @@ sig
 (*    val transVar: venv * tenv * Abysn.dec -> expty *)
     val transDecs: Translate.level * venv * tenv * Absyn.dec list -> {venv: venv, tenv: tenv}
     val transTy : tenv * Absyn.ty -> Types.ty
-    val transProg: Absyn.exp -> expty
+    val transProg: Absyn.exp -> unit
 end
 
 structure Semant : SEMANT =
@@ -490,7 +490,8 @@ and transProg exp =
         (* first layer after outer *)
         val main_level = T.newLevel {parent=T.outermost, name=Symbol.symbol "main_level", formals=[]}
     in
-        transExp (main_level, Env.base_venv, Env.base_tenv, exp, NOTLOOP)
+        transExp (main_level, Env.base_venv, Env.base_tenv, exp, NOTLOOP);
+        ()
     end
 
 end

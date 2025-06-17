@@ -44,7 +44,7 @@ fun traverseExp (env: escEnv, d: depth, s:Absyn.exp): unit =
             let
                 val env' = traverseDecs (env, d, decs)
             in
-                traverseExp (env, d, body)
+                traverseExp (env', d, body)
             end
           | trExp _ = ()
     in
