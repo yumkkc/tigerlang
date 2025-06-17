@@ -13,6 +13,8 @@ sig
     val transProg: Absyn.exp -> unit
 end
 
+(* TODO: Function still refers to the parent level while processig the body. Fix that *)
+
 structure Semant : SEMANT =
 struct
 
