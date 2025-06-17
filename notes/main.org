@@ -1,0 +1,228 @@
+* Chapter 6
+#+DATE: June 17, 2025
+
+* Escape Analysis
+  ** Purpose
+    - Determines if a variable *escapes* its scope (accessed outside its declaring scope).
+    - Escaping variables are stored in the stack frame (memory), not registers.
+    - Critical for nested functions where variables may be accessed after the outer function returns.
+
+  ** Why Only in Function Nesting (Not Let Nesting)?
+    - *Function Nesting*:
+      - Variables escape if accessed by a nested function that may outlive the outer function (e.g., returned as a closure).
+      - Requires stack frame persistence or heap allocation for correctness.
+      - Example:
+        #+BEGIN_SRC tiger
+        let
+          function make_counter() =
+            let
+              var count := 0
+              function increment() = (count := count + 1; print_int(count))
+            in
+              increment
+            end
+          var counter := make_counter()
+        in
+          counter()  (* Prints 1 *)
+          counter()  (* Prints 2 *)
+        end
+        #+END_SRC
+        - `count` escapes because `increment` can be called after `make_counter` returns.
+    - *Let Nesting*:
+      - Variables are confined to the lexical scope of the `let` block, with no callable entities (functions) that outlive the block.
+      - No need for escape analysis unless a nested function is involved.
+      - Example:
+        #+BEGIN_SRC tiger
+        let
+          var x := 10
+        in
+          let
+            var y := x + 5
+          in
+            print_int(y)
+          end
+        end
+        #+END_SRC
+        - `x` doesn’t escape; accessed only within the `let` block’s lifetime.
+
+  ** Implementation
+    - Performed during semantic analysis or IR generation.
+    - Marks variables as escaping if accessed by a nested function.
+    - Escaping variables are allocated in the stack frame (`InFrame(offset)`).
+
+* Static Links
+  ** Definition
+    - A pointer to the stack frame of the immediately enclosing function, allowing nested functions to access outer scope variables.
+    - Stored as the first formal parameter in a nested function’s stack frame (e.g., `InFrame(0)`).
+
+  ** Purpose
+    - Enables access to variables in outer scopes by following the static link chain.
+    - Ensures correct scoping for variables in nested functions, especially in closures.
+
+  ** Example Stack Frame Layout
+    #+BEGIN_SRC tiger
+    let
+      function outer() =
+        let
+          var a := 10
+          function inner() = print_int(a)
+        in
+          inner()
+        end
+    in
+      outer()
+    end
+    #+END_SRC
+    - *outer’s Stack Frame* (FP at `100`):
+      #+BEGIN_EXAMPLE
+      | Static link (to global) | 100 (FP + 0)
+      | a (InFrame(4))          | 104 (FP + 4)
+      #+END_EXAMPLE
+    - *inner’s Stack Frame* (FP at `108`):
+      #+BEGIN_EXAMPLE
+      | Static link (to outer) | 108 (FP + 0, value = 100)
+      #+END_EXAMPLE
+    - Accessing `a` in `inner`:
+      - Fetch static link: `MEM(FP + 0)` → `100` (outer’s FP).
+      - Access `a`: `MEM(100 + 4)` → `104`.
+      - IR:
+        #+BEGIN_SRC ml
+        Tree.MEM(Tree.BINOP(Tree.PLUS, Tree.MEM(Tree.TEMP(FP)), Tree.CONST(4)))
+        #+END_SRC
+
+  ** Static Link as Formal Parameter
+    - Passed as the first parameter to a nested function.
+    - Stored in the nested function’s stack frame (e.g., `InFrame(0)`).
+    - Example: In `inner`, static link points to `outer`’s FP (`100`).
+
+  ** Traversal
+    - To access a variable (e.g., `a` at `InFrame(4)` in `outer`):
+      - Compare current level (`inner_level`) with variable’s declaring level (`outer_level`).
+      - Follow static links based on level difference (e.g., 1 hop for `outer_level`).
+      - Stop when the level’s `name: Temp.label` matches the variable’s level.
+    - Example for multiple levels:
+      #+BEGIN_SRC tiger
+      let
+        function outermost() =
+          let
+            var a := 10
+            function outer() =
+              let
+                function inner() = print_int(a)
+              in
+                inner()
+              end
+          in
+            outer()
+          end
+      in
+        outermost()
+      end
+      #+END_SRC
+      - Traversal: `inner` → `outer` → `outermost` (2 hops).
+      - IR:
+        #+BEGIN_SRC ml
+        let sl1 = Tree.MEM(Tree.BINOP(Tree.PLUS, Tree.TEMP(FP), Tree.CONST(0)))  (* inner to outer *)
+        let sl2 = Tree.MEM(Tree.BINOP(Tree.PLUS, sl1, Tree.CONST(0)))  (* outer to outermost *)
+        in Tree.MEM(Tree.BINOP(Tree.PLUS, sl2, Tree.CONST(4)))  (* access a *)
+        end
+        #+END_SRC
+
+* Levels and Frames
+  ** Level Datatype
+    #+BEGIN_SRC ml
+    datatype level = innerlevel of {parent: level, name: Temp.label, frame: Frame.frame}
+    #+END_SRC
+    - `parent`: Points to enclosing level (or `NONE` for top level).
+    - `name`: `Temp.label` uniquely identifies the function’s code (e.g., `_outer_123`).
+    - `frame`: `Frame.frame` with stack frame layout.
+
+  ** Frame Structure
+    #+BEGIN_SRC ml
+    type frame = {name: Temp.label, formals: access list, locals: int ref}
+    #+END_SRC
+    - `name`: `Temp.label` for function’s code entry point.
+    - `formals`: List of `Frame.access` for parameters (including static link).
+    - `locals`: Tracks local variables.
+
+  ** Frame.access
+    #+BEGIN_SRC ml
+    type access = InFrame of int | InReg of Temp.temp
+    #+END_SRC
+    - `InFrame(offset)`: Variable at offset relative to FP (e.g., `FP + 4` for `a`).
+    - `InReg(temp)`: Variable in a register (for non-escaping variables).
+
+  ** Role of Temp.label
+    - Identifies function’s code entry point, not variable memory locations.
+    - Used in level matching to compute static link hops (e.g., match `var_level.name` with current level’s `name`).
+    - Cannot directly access variables; static links are needed for dynamic stack frame resolution.
+
+* Variable Access
+  ** Process
+    - Variable stored as `(level, Frame.access)` in environment.
+    - Example: `a` as `(outer_level, InFrame(4))`.
+    - Compiler computes level difference to determine static link hops.
+    - Generates IR to follow static links and access variable at offset.
+
+  ** Why Static Links?
+    - Stack frames are dynamic; addresses vary per function call.
+    - Static links point to the correct frame for the specific activation.
+    - `Temp.label` is for code, not data; cannot resolve dynamic variable addresses.
+
+* Closure and Heap Allocation
+  ** Closures
+    - A closure is a pair: (function code pointer, static link).
+    - Example: `increment` closure in `make_counter` includes `_increment_456` and `make_counter`’s FP.
+    - Ensures access to outer variables after outer function returns.
+
+  ** Heap Allocation
+    - Escaping variables (e.g., `count`) are often heap-allocated in practice to persist beyond outer function’s return.
+    - Static link in closure points to heap record containing escaping variables.
+    - Garbage collector manages lifetime, ensuring memory persists while closure is live.
+
+* Key Implementation Details
+  ** Escape Analysis
+    - Marks variables as escaping if accessed by nested functions.
+    - Performed in `FindEscape` module (semantic analysis).
+    - Depth incremented by 1 per function nesting (e.g., `d+1` in `traverseDecs`).
+
+  ** Translate Module
+    - `Translate.accessExp` generates IR for variable access, handling static link traversal.
+    - Uses level differences to compute hops.
+
+  ** Frame Module
+    - `Frame.newFrame` creates stack frame, allocating static link as first formal (`InFrame(0)`).
+    - All formals assumed to escape for simplicity.
+
+* Common Misconceptions
+  - *Static Link at `FP - 8`*: Incorrect; static link is at `FP + 0` in inner function’s frame, pointing to outer’s FP.
+  - *Temp.label for Variables*: Labels are for code, not variable addresses; static links resolve dynamic frames.
+  - *Let Nesting Needs Escape Analysis*: Only needed if nested functions are involved.
+
+* Related SML Notes
+  ** Mutually Recursive Functions
+    - Use `and` keyword for functions like `isEven` and `isOdd`.
+    - Example:
+      #+BEGIN_SRC ml
+      fun isEven(n) = if n = 0 then true else isOdd(n - 1)
+      and isOdd(n) = if n = 0 then false else isEven(n - 1)
+      #+END_SRC
+
+  ** Match Redundant Warning
+    - Occurs when a pattern is unreachable due to earlier patterns.
+    - Fix by reordering patterns or ensuring proper coverage.
+
+  ** Temp Module
+    - `newtemp()`: Generates unique temporaries for registers.
+    - `newlabel()`: Creates unique labels for code or data.
+    - Example:
+      #+BEGIN_SRC ml
+      type temp = int
+      val newtemp = fn () => (* generate unique int *)
+      type label = Symbol.symbol
+      val newlabel = fn () => (* generate unique symbol *)
+      #+END_SRC
+
+* References
+  - /Modern Compiler Implementation in ML/ (or C/Java), Chapters 5-7 (semantic analysis, IR generation).
+  - Discussions on escape analysis, static links, and stack frames from June 2025 conversations.
