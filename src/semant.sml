@@ -289,7 +289,7 @@ fun transExp (level, venv, tenv, exp, context: context) =
                 val lo_ty = trexp lo
                 val hi_ty = trexp hi
                 val access' = T.allocLocal level (!escape)
-                val venv' = Symbol.enter (venv, var, (Env.VarEntry {ty=Types.INT, access=access'})) (* TODO *)
+                val venv' = Symbol.enter (venv, var, (Env.VarEntry {ty=Types.INT, access=access'}))
                 val body_ty = transExp (level, venv', tenv, body, LOOP)
             in
                 checkInt(lo_ty, pos);
