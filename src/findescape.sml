@@ -30,13 +30,12 @@ fun traverseExp (env: escEnv, d: depth, s:Absyn.exp): unit =
           | trExp (A.WhileExp {test, body, pos}) = (trExp test; trExp body)
           | trExp (A.ForExp {var, escape, lo, hi, body, pos}) =
             let
-                val d' = d + 1
                 val _ = (escape := false)
-                val env' = Symbol.enter (env,var, (d', escape))
+                val env' = Symbol.enter (env,var, (d, escape))
             in
                 (trExp lo;
                  trExp hi;
-                 traverseExp (env', d', body)
+                 traverseExp (env', d, body)
                 )
             end
           | trExp (A.ArrayExp {typ, size, init, pos}) = (trExp size; trExp init)
