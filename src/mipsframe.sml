@@ -16,8 +16,16 @@ fun assignReg() = InReg (Temp.newtemp())
 fun assignMemOrReg true = (assignMem(), true)
   | assignMemOrReg false = (assignReg(), false)
 
+(* first four gets assigned register *)
+val limit = 4
+
+fun assignParam [] _ = []
+  | assignParam (true::formals) count = (assignMem(), true)::(assignParam formals count)
+  | assignParam (false::formals) count = if (count <=limit) then (assignReg(), false)::(assignParam formals (count-1))
+                                       else (assignReg(), false) :: (assignParam formals (count-1))
+
 fun newFrame {name, formals}: frame = {name = name,
-                                formals = (map assignMemOrReg formals),
+                                formals = (assignParam formals limit),
                                 locals = ref []}
 
 fun name {name=name, formals=_, locals=_ } = name
