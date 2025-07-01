@@ -300,7 +300,7 @@ fun transExp (level, venv, tenv, exp, context: context) =
 
         and trvar (A.SimpleVar (id, pos)) =
             (case Symbol.look(venv, id)
-              of SOME(E.VarEntry{ty, access}) => {exp = (), ty = actual_ty ty}
+              of SOME(E.VarEntry{ty, access}) => {exp = Translate.simpleVar (access, level), ty = actual_ty ty}
                | _ => ((ErrorMsg.error pos ("undefined variable " ^ Symbol.name id));
                        {exp = (), ty=Types.NIL}))
 

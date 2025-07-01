@@ -18,6 +18,7 @@ frame.sig
 mipsframe.sml
 translate.sml
 findescape.sml
+tree.sml
 $/basis.cm
 $/smlnj-lib.cm
 $/ml-yacc-lib.cm

@@ -10,19 +10,27 @@ sig
     val allocLocal: level -> bool -> access
     val formals: level -> access list
 
+    (* manipulation *)
+    val simpleVar : access * level -> exp
 end
 
 structure Translate : TRANSLATE =
 struct
 
 structure Frame = MipsFrame
+structure Tree = T
 
 datatype level = innerlevel of {parent : level,
                                 name: Temp.label,
                                 frame: Frame.frame } | outermost
 
 type access = level * Frame.access
-type exp = unit
+
+datatype exp = Ex of Tree.exp
+             | Nx of Tree.stm
+             | Cx of Temp.label * Temp.label -> Tree.stm
+             | unit
+
 
 fun newLevel {parent=parent, name=name, formals=formals} =
     innerlevel {parent=parent,
@@ -48,4 +56,9 @@ fun formals level : access list =
                                                          in trans_access
                                                     end
       | outermost =>  raise TranslationError ("No formals present in outermost layear")
+
+(* main functions *)
+fun simpleVar (var_access, var_level) =
+    Frame.exp var_access T.TEMP(FP)
+
 end
