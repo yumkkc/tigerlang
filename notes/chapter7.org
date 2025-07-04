@@ -1,0 +1,135 @@
+#+title: Translation to Intermediate Code
+
+- The frontend of the compiler does the lexical analysis, parsing and semantic analysis.
+- the semantic analysis part of the compiler must convert to IR (intermediate representation)
+- The back-end does the /IR/ optimisations and generation of machine-specific instructions
+
+- IR is a Abstract machine language that can express the target-machine oeprations without commiting to the machine-specific lang.
+- It is also independent of the source langauge
+
+- A portable compiler translates the source language into IR and then translates the IR into the machine language
+
+
+** Intermediate Representation Trees
+
+- an overately complicate structure in AST like records, array subscripts etc. cannot be directly transalted into IR.
+- IR will basically represent extremely simple constructs like Fetch, store,add, move or jump.
+- Then any chunky piece of AST can be translated into just the right set of abstract machine instructions.
+- Then the Abstract machine instructions can be clumped together to form "real" machine instructions
+
+
+#+begin_src sml
+
+signature TREE =
+sig
+    datatype exp = CONST of int (* integer constant i *)
+           | NAME of Temp.label (* corresponding to asm label *)
+           | TEMP of Temp.temp (* similar to register in real machine but in this case its infinite *)
+           | BINOP of binop * exp * exp (* just an operation *)
+           | MEM of exp (* wordSize byte of memory starting at exp *)
+           | CALL of exp * exp list (* call to exp with exp list arguments *)
+           | ESEQ of stm * exp (* stat is executed for side effects. exp is returned *)
+
+    and stm = MOVE of exp * exp (* can have several variant ->
+                                     MOVE (TEMP t, e) => evaluates e and moves to t (register)
+                                     MOVE (MEM(e1), e2) => evaluate e1, yielding address a. Then evalute e2 and store the result into wordsize bytes of memory starting at a.
+                                 ,*)
+      | EXP of exp (* evaluate e and discard the result *)
+      | JUMP of exp * Temp.label list (* transfer control to exp
+                                       JUMP(NAME(lab), [lab]) => jumps directly to lab
+                                      JUMP(e, [lab1, lab2]) => evalute e and gets the address. list here specifies which  all label can e jump to
+                                       ,*)
+      | CJUMP of relop * exp * exp * Temp.label * Temp.label
+                                                      (* evaluates exp1 to a, exp2 to b
+                                                      compare a and b
+                                                      then if true, then jump to temp.label1
+                                                      else label2
+                                                       ,*)
+      | SEQ of stm * stm (* stm1 follow wed by stm2 *)
+      | LABEL of Temp.label (* define a constant name n to be the current machine code address. *)
+
+    and  binop = PLUS | MINUS |MUL | DIV
+       | AND | OR | LSHIFT | RSHIFT | ARSHIFT | XOR
+
+    and relop = EQ | NE | LT | GT | LE | GE
+      | ULT | ULE | UGT | UGE
+end
+#+end_src
+
+
+** Translation into trees
+
+- The Absyn.exp should be logically be translated to Tree.exp? NO!! Only the certain expressions are to be converted to Tree.exp
+- These are the ones that compute the value.
+- The ones which do not compute the values are to be put to Tree.stm
+- Expressiosn with boolean values, such as a>b, might be represented as a conditional jump - a combination of Tree.stm and a pair of destinations represented by Temp.labels
+
+  Threfore, in translate module we can:-
+
+
+#+begin_src sml
+datatype exp = Ex of Tree.exp (*  represents expressions *)
+       | Nx of Tree.stm (* No result *)
+       | Cx of Temp.label * Temp.label -> Tree.stm
+                                              (* takes two labels and generats a statement which gives stm which jumps to one of these two*)
+#+end_src
+
+example:
+
+#+begin_src
+a>b|c<d
+
+Cx (fn (t, f)   => SEQ (CJUMP (GT, a, b, t, z),
+                       SEQ (LABEL z, CJUMP(LT, c, d, t, f))))
+
+#+end_src
+
+
+** SIMPLE VARIABLES
+
+#+begin_src text
+
+SimpleVar ("a", _)
+
+MEM (BINOP (PLUS, TEMP fp, CONST k)) => + (TEMP fp, CONST k)
+
+- fp is the frame pointer in the register and k is the offset of v within the frame. Therefore, you can figure that this is the variable that is in "this" stack frame
+
+exp: access -> Tree.exp -> Tree.exp
+
+Frame.exp (a) (TEMP(Frame.FP)) = MEM(BINOP(PLUS, TEMP(Frame.FP), CONST(k)))
+#+end_src
+
+*** Following static links
+
+In the exp, the second exp passed is either the TEMP(Frame.FP) is the variable is being accessed from the same level as it is declared. But if being accesed from the nested function, we pass the static link to this. Now what is the static link?
+
+Static link links each one of the nested function to its parent. We calcualte the static link and pass this as the third parameter.
+
+Lets say the 2nd level nested function is accessing the variable a. then we pass
+
+Frame.exp (a) (MEM (+ (CONST k, TEMP fp)))
+
+** Array
+
+- Array are stored in the heap and only the pointer is stored in memory.
+- to convert expression,
+
+  this is for a[i] where e is the starting address or e is stored in memory
+  #+begin_src
+  MEM(+(MEM((e), BINOP(MUL, I, CONST W)))
+  #+end_src
+
+** ARITHMETIC
+
+every Absyn has corrponsing tree
+
+** CONDITIONS
+
+
+
+*  Excercises
+
+1.
+
+   d. CALL (NAME writef, [sl, NAME lab])

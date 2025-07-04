@@ -1,5 +1,10 @@
 structure MipsFrame : FRAME = struct
 
+structure T = Tree
+
+val wordSize = 8
+val FP = Temp.newtemp()
+
 (* determines where the value will be stored -> register (temp) or memory (int) *)
 datatype access = InFrame of int | InReg of Temp.temp
 
@@ -30,10 +35,10 @@ fun newFrame {name, formals}: frame = {name = name,
 
 fun name {name=name, formals=_, locals=_ } = name
 
-fun formals {name=name, formals=formals, locals=_} =
+fun formals {name=_, formals=formals, locals=_} =
     (map (fn (access, _) => access) formals)
 
-fun allocLocal {name, formals, locals} isescape =
+fun allocLocal {name = _, formals=_, locals} isescape =
     let
         val new_access = assignMemOrReg isescape
         val (access, _) = new_access
@@ -41,5 +46,10 @@ fun allocLocal {name, formals, locals} isescape =
         locals := new_access :: !locals;
         access
     end
+
+fun exp (InFrame c) (fp: T.exp) =
+    T.MEM(T.BINOP (T.PLUS, fp, T.CONST c))
+
+  |  exp (InReg reg) (fp: T.exp) = T.TEMP reg
 
 end
