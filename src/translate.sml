@@ -23,6 +23,8 @@ sig
     val callExp : Temp.label -> level -> level -> exp list -> exp
     val initArray : level -> exp -> exp -> exp
     val recordInit : level -> exp list -> exp
+    val ifExp : exp -> exp -> exp -> exp
+    val whileLoop : 
 end
 
 
@@ -49,8 +51,52 @@ datatype exp = Ex of Tree.exp
 (* converision function exp -> Tree *)
 fun UnEx (Ex e) = e
   | UnEx (Nx s)  = T.ESEQ (s, T.CONST 0)
-  | UnEx (Cx genstm) = T.CONST 0
+  | UnEx (Cx genstm) = let
+                            val r = Temp.newtemp()
+                            val t = Temp.newlabel()
+                            val f = Temp.newlabel()
+                        in
+                        T.ESEQ (
+                        T.SEQ (
+                            T.MOVE (T.MEM(T.TEMP r), T.CONST 0),
+                            T.SEQ (
+                                genstm (t,f),
+                                T.SEQ (
+                                    T.LABEL t,
+                                    T.SEQ (
+                                        T.MOVE (T.MEM(T.TEMP r), T.CONST 1),
+                                        T.LABEL f
+                                    )
+                                )
+
+                            )
+                        ),
+                        T.TEMP r
+                        )
+                        end
+    
   | UnEx to_be_replaced  = T.CONST 0
+
+  fun UnNx (Nx s) = s
+    | UnNx (Ex e) = T.EXP e
+    | UnNx (Cx genstm) = let
+                            val t = Temp.newlabel()
+                            val f = Temp.newlabel()
+                        in
+                            genstm(t,f)
+                        end
+    | UnNx to_be_replaced = T.EXP (T.CONST 0)
+
+
+    fun UnCx (Cx genstm) = genstm
+      | UnCx (Ex e) = (fn (t,f) => T.CJUMP (T.GT, e, T.CONST 0, t, f ))
+      | UnCx (Nx _ ) = ErrorMsg.impossible "cannot have UnCx of Nx in welltyped programs"
+      | UnCx to_be_replaced  = fn (_,_) => T.EXP (T.CONST 0)
+
+    
+
+
+
 
 
 fun newLevel {parent=parent, name=name, formals=formals} =
@@ -217,6 +263,39 @@ fun recordInit curr_level (exp_list: exp list) =
                 (moveRecValue tree_exp_list expr_len)
             ),
             T.TEMP res_temp
+        )
+    )
+    end
+
+ fun ifExp test true_exp false_exp = 
+    let    
+        val test_cx = UnCx test
+        val t_true_exp = UnEx true_exp
+        val t_false_exp = UnEx false_exp
+        val t_label = Temp.newlabel()
+        val f_label = Temp.newlabel()
+        val res_temp = Temp.newtemp()
+        val final_jump = Temp.namedlabel("join")
+    in
+    Nx(
+        T.SEQ (
+            test_cx (t_label, f_label),
+            T.SEQ (
+                T.LABEL t_label,
+                T.SEQ (
+                T.MOVE (T.TEMP res_temp, t_true_exp),
+                T.SEQ(
+                T.JUMP (T.NAME final_jump, [final_jump]),
+                T.SEQ (
+                    T.MOVE (T.TEMP res_temp, t_false_exp),
+                    T.SEQ (
+                        T.JUMP (T.NAME final_jump, [final_jump]),
+                        T.LABEL final_jump
+                    )
+                )
+                )
+                )
+            )
         )
     )
     end
