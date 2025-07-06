@@ -160,7 +160,7 @@ fun transExp (level, venv, tenv, exp, context: context) =
 
           | trexp (A.VarExp var) = trvar var
 
-          | trexp (A.IntExp arg) = {exp = Translate.intExp arg, ty = Types.INT}
+          | trexp (A.IntExp arg) = {exp = (Translate.intExp level arg), ty = Types.INT}
 
           | trexp  (A.StringExp arg) = {exp = T.to_be_replaced, ty = Types.STRING} (* TODO: Handle string later *)
 
@@ -170,29 +170,31 @@ fun transExp (level, venv, tenv, exp, context: context) =
               end
 
           | trexp (A.BreakExp pos) = (case context of
-                                     NOTLOOP => ((ErrorMsg.error pos "break statment not allowed here"); {exp=T.to_be_replaced, ty=Types.UNIT})
+                                     NOTLOOP => ((ErrorMsg.error pos "break statment not allowed here"); 
+                                     {exp=T.to_be_replaced, ty=Types.UNIT})
                                    | LOOP => {exp=T.to_be_replaced, ty=Types.UNIT}
                                  )
 
           | trexp (A.RecordExp {fields, typ, pos}) = (
             case Symbol.look (tenv, typ) of
-                SOME (Types.RECORD (record_typs, _ )) =>
+                SOME (Types.RECORD (record_typs, unique )) =>
                 let
-                    fun loop [] = {exp = T.to_be_replaced, ty = Types.RECORD (record_typs, ref ())}
+                    fun loop [] = []                        
+
                       | loop ((symbol, exp, pos)::rest) = (
                         case find_ty (symbol, record_typs) of
-                            SOME ty => let val {exp = _, ty=expty} = trexp exp
+                            SOME ty => let val {exp = t_exp, ty=expty} = trexp exp
                                         in
-                                            if (expty = ty ) then loop rest
+                                            if (expty = ty ) then t_exp :: (loop rest)
                                             else ((ErrorMsg.error pos ("Type of record " ^ Symbol.name typ ^ " does not match" ));
-                                                      {exp=T.to_be_replaced, ty=Types.NIL})
+                                                      [])
                                         end
                           | NONE => ((ErrorMsg.error pos (Symbol.name symbol ^ " not found in record: " ^ Symbol.name typ));
-                                         {exp = T.to_be_replaced, ty=Types.NIL})
+                                         [])
                     )
-
+                    val t_exp_list = loop fields
                 in
-                    loop fields
+                    {exp = (Translate.recordInit level t_exp_list), ty = Types.RECORD (record_typs, unique)}
                 end
               | _ => ((ErrorMsg.error pos ("No record of type " ^ Symbol.name typ ^ " found"));
                              {exp = T.to_be_replaced, ty=Types.NIL})
@@ -202,11 +204,12 @@ fun transExp (level, venv, tenv, exp, context: context) =
             case lookupActualType(pos, tenv, typ) of
                 Types.ARRAY (arr_ty, _) => (
                  case trexp size of
-                    {exp = _, ty=Types.INT} =>
+                    {exp = size_exp, ty=Types.INT} =>
                               let val {exp = init_exp, ty = init_ty} = trexp init
                               in
                                   if (actual_ty init_ty = actual_ty arr_ty)
-                                  then {exp=T.to_be_replaced, ty=(Types.ARRAY (arr_ty, ref ()))}
+                                  then {exp= (Translate.initArray level size_exp init_exp), 
+                                  ty=(Types.ARRAY (arr_ty, ref ()))}
                                   else ((ErrorMsg.error pos (Symbol.name typ ^ " does not match the type of initialization"));
                                             {exp=T.to_be_replaced, ty=Types.NIL})
                               end
@@ -219,12 +222,14 @@ fun transExp (level, venv, tenv, exp, context: context) =
 
           | trexp (A.AssignExp {var, exp, pos}) = 
               let
-                  val {exp=_, ty=var_ty} = trvar var
-                  val {exp=_, ty=exp_ty} = trexp exp
+                  val {exp=t_exp1, ty=var_ty} = trvar var
+                  val {exp=value, ty=exp_ty} = trexp exp
             in
-                if (var_ty = exp_ty) then {exp=T.to_be_replaced, ty = Types.UNIT} else
-                ((ErrorMsg.error pos "type is assign statement does not match");
-                     {exp=T.to_be_replaced, ty = Types.NIL})
+                 if (var_ty = exp_ty) then {exp=(Translate.assignVar t_exp1 value), 
+                                            ty = Types.UNIT} 
+                                            else
+                    ((ErrorMsg.error pos "type is assign statement does not match");
+                        {exp=T.to_be_replaced, ty = Types.NIL})
             end
 
           | trexp (A.SeqExp exps) =
@@ -237,28 +242,30 @@ fun transExp (level, venv, tenv, exp, context: context) =
             end
 
           | trexp  (A.CallExp {func, args, pos}) =
-            (
+          (
               case Symbol.look (venv, func) of
-                  SOME (Env.FunEntry {formals, result, level, label}) => (
+                  SOME (Env.FunEntry {formals, result, level=func_level, label}) => 
                    let
                        fun check_type_param (formal::formals, arg::args) =
-                           let val {exp=_, ty=t'} = trexp arg
-                           in if not (actual_ty formal = actual_ty t') then
-                                  ((ErrorMsg.error pos "type does not match");
-                                       false andalso check_type_param (formals, args))
-                              else true andalso check_type_param (formals, args)
+                           let val {exp=t_exp, ty=t'} = trexp arg
+                           in 
+                           (if not (actual_ty formal = actual_ty t') then
+                            (ErrorMsg.error pos "type does not match")                                   
+                            else ());
+                            t_exp :: check_type_param (formals, args)
                            end
-                         | check_type_param  ([], []) = true
+                         | check_type_param  ([], []) = []
                          | check_type_param (_, _) = (ErrorMsg.error pos (Symbol.name func ^ " length of parameters does not match the ones passed");
-                          false)
+                          [])
+
+                      val t_exp_list =      check_type_param (formals, args)
+                      val call_exp = Translate.callExp label level func_level t_exp_list
                        in
-                           check_type_param (formals, args);
-                                            {exp=T.to_be_replaced, ty=result}
+                           {exp=call_exp, ty=result}
                        end
-               )
                |  _ => ((ErrorMsg.error pos (Symbol.name func ^ " not a function variable"));
                             {exp=T.to_be_replaced, ty=Types.NIL})
-            )
+          )
 
           | trexp (A.IfExp {test, then', else'=SOME(els_exp), pos}) =
             let
@@ -267,7 +274,7 @@ fun transExp (level, venv, tenv, exp, context: context) =
                 val {exp = _, ty = elseA} = trexp els_exp
             in
                 checkInt(testA, pos);
-                check_type_equality(thenA, elseA, pos, ("then and else should have same type"));
+                check_type_equality(thenA, elseA, pos, "then and else should have same type");
                 {exp=T.to_be_replaced, ty = elseA}
             end
 
@@ -322,10 +329,10 @@ fun transExp (level, venv, tenv, exp, context: context) =
                 {exp=_, ty = Types.ARRAY (var_ty, _)} => (
                         case (trexp exp) of
                             {exp = _, ty = Types.INT} => {exp = T.to_be_replaced, ty=var_ty}
-                            | _ => ((ErrorMsg.error pos ("Array subscript type should be Integer"));
+                            | _ => ((ErrorMsg.error pos "Array subscript type should be Integer");
                                                           {exp = T.to_be_replaced, ty = Types.NIL})
             )
-                      | _ => ((ErrorMsg.error pos ("Variable should be an array"));
+                      | _ => ((ErrorMsg.error pos "Variable should be an array");
                                                           {exp = T.to_be_replaced, ty = Types.NIL})
           )
 
@@ -337,7 +344,7 @@ fun transExp (level, venv, tenv, exp, context: context) =
                                                         | NONE => (ErrorMsg.error pos (Symbol.name sym ^ " not found in record");
                                                                                   {exp = T.to_be_replaced, ty = Types.INT})
                             )
-                          | _ => (ErrorMsg.error pos ("Not a record type");
+                          | _ => (ErrorMsg.error pos "Not a record type";
                                                  {exp = T.to_be_replaced, ty = Types.INT})
           )
 
@@ -355,7 +362,7 @@ and transDecs (level, venv, tenv, dec::decs, exps) =
                 val access' = T.allocLocal level (!escape)
             in {tenv = tenv,
                 venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty, access=access'}),
-                exps=Translate.assignVar (access', exp)::exps
+                exps=(Translate.initVar access' level exp)::exps
                }
             end
 
@@ -363,7 +370,7 @@ and transDecs (level, venv, tenv, dec::decs, exps) =
 
           | transDec (venv, tenv, A.VarDec {name, typ=SOME(sym_ty, sym_pos), pos, init, escape}) = (
             case Symbol.look (tenv, sym_ty) of
-                SOME(res_ty) => (
+                SOME(res_ty) =>
                              let
                                  val {exp, ty} = transExp(level, venv, tenv, init, NOTLOOP)
                                  val access' = T.allocLocal level (!escape)
@@ -372,10 +379,9 @@ and transDecs (level, venv, tenv, dec::decs, exps) =
                                         ("result type of " ^ Symbol.name name ^ " and " ^ Symbol.name sym_ty ^ " does not match"));
                                  {tenv = tenv,
                                   venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty, access=access'}),
-                                  exps=Translate.assignVar (access', exp)::exps
+                                  exps=(Translate.initVar access' level exp)::exps
                                  }
                              end
-             )
                | NONE => ((ErrorMsg.error sym_pos (Symbol.name sym_ty ^ " type not found"));
                 {venv=venv, tenv=tenv, exps=exps})
           )

@@ -50,6 +50,23 @@ fun allocLocal {name = _, formals=_, locals} isescape =
 fun exp (InFrame c) (fp: T.exp) =
     T.MEM(T.BINOP (T.PLUS, fp, T.CONST c))
 
-  |  exp (InReg reg) (fp: T.exp) = T.TEMP reg
+  |  exp (InReg reg) (_: T.exp) = T.TEMP reg
+
+
+fun arrayMem index base_add = 
+  T.MEM (
+    T.BINOP (
+      T.PLUS, 
+      T.MEM base_add, 
+      T.BINOP (
+        T.MUL,
+        T.CONST index,
+        T.CONST wordSize
+        )
+      )
+    )
+
+fun externalCall (name: string) (args : Tree.exp list) = 
+  T.CALL (T.NAME (Temp.namedlabel name), args)
 
 end
