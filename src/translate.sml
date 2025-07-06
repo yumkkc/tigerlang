@@ -23,8 +23,11 @@ sig
     val callExp : Temp.label -> level -> level -> exp list -> exp
     val initArray : level -> exp -> exp -> exp
     val recordInit : level -> exp list -> exp
-    val ifExp : exp -> exp -> exp -> exp
-    val whileLoop : 
+    val ifElseExp : exp -> exp -> exp -> exp
+    val ifExp : exp -> exp -> exp
+    val whileLoop : exp -> exp -> exp
+    val subscript : exp ->  exp -> exp
+
 end
 
 
@@ -260,14 +263,14 @@ fun recordInit curr_level (exp_list: exp list) =
         T.ESEQ(
             T.SEQ (
                 T.MOVE (T.TEMP res_temp, record_add),
-                (moveRecValue tree_exp_list expr_len)
+                (moveRecValue tree_exp_list 0)
             ),
             T.TEMP res_temp
         )
     )
     end
 
- fun ifExp test true_exp false_exp = 
+ fun ifElseExp test true_exp false_exp = 
     let    
         val test_cx = UnCx test
         val t_true_exp = UnEx true_exp
@@ -299,5 +302,62 @@ fun recordInit curr_level (exp_list: exp list) =
         )
     )
     end
+
+    fun ifExp test true_exp = 
+        let
+            val test_cx = UnCx test
+            val t_true_exp = UnEx true_exp
+            val t_label = Temp.newlabel()
+            val final_label = Temp.namedlabel("join")
+            val res_temp = Temp.newtemp()
+        in
+            Nx(
+                T.SEQ (
+                    test_cx (t_label, final_label),
+                    T.SEQ (
+                        T.LABEL t_label,
+                        T.SEQ (
+                            T.MOVE (T.TEMP res_temp, t_true_exp),
+                            T.LABEL final_label
+                        )
+                    )
+                )
+            )
+        end
+
+fun whileLoop test body = 
+    let
+        val done_label = Temp.newlabel()
+        val continue_label = Temp.newlabel()
+        val test_cx = UnCx test
+    in
+        Nx (
+        T.SEQ (
+            test_cx (continue_label, done_label),
+            T.SEQ(
+                T.LABEL continue_label,
+                T.SEQ (
+                    UnNx body,
+                        T.LABEL done_label
+                )
+            )
+        )
+        )
+    end
+
+fun subscript expr index = 
+        Ex(
+        T.MEM (
+            T.BINOP (
+                T.PLUS,
+                UnEx expr,
+                T.BINOP (
+                    T.MUL,
+                    UnEx index,
+                    T.CONST Frame.wordSize
+                )
+            )
+        )   
+        )
 
 end

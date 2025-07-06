@@ -129,6 +129,13 @@ fun transExp (level, venv, tenv, exp, context: context) =
 
         and
 
+        find_record_index _ [] pos _ = ((ErrorMsg.error pos "Cannot find the field to access in the record"); 0)
+        | find_record_index fin_sym ((d_sym, _)::rest) pos index = 
+            if (fin_sym = d_sym) then index
+            else find_record_index fin_sym rest pos index+1
+
+        and
+
          trexp A.NilExp = {exp =T.to_be_replaced, ty = Types.UNIT}
 
          | trexp (A.OpExp {left, oper=A.PlusOp, right, pos}) =
@@ -270,23 +277,22 @@ fun transExp (level, venv, tenv, exp, context: context) =
           | trexp (A.IfExp {test, then', else'=SOME(els_exp), pos}) =
             let
                 val testA = trexp test
-                val {exp = _, ty = thenA} = trexp test
-                val {exp = _, ty = elseA} = trexp els_exp
+                val {exp = then_exp, ty = thenA} = trexp test
+                val {exp = else_exp, ty = elseA} = trexp els_exp
             in
                 checkInt(testA, pos);
                 check_type_equality(thenA, elseA, pos, "then and else should have same type");
-                {exp=T.to_be_replaced, ty = elseA}
+                {exp=(Translate.ifElseExp (#exp testA) then_exp else_exp), ty = elseA}
             end
 
           | trexp (A.IfExp {test, then', else'= NONE, pos}) =
             let
                 val testA = trexp test
                 val thenA = trexp test
-                val {exp = _, ty=then_type} = thenA
             in
                 checkInt(testA, pos);
                 checkUnit(thenA, pos);
-               {exp=T.to_be_replaced, ty = Types.UNIT}
+               {exp=(Translate.ifExp (#exp testA) (#exp thenA)) , ty = Types.UNIT}
             end
 
           | trexp (A.WhileExp {test, body, pos}) =
@@ -295,21 +301,26 @@ fun transExp (level, venv, tenv, exp, context: context) =
             in
                 checkInt (test_ty, pos);
                 checkUnit (body_ty, pos);
-                {exp=T.to_be_replaced , ty = Types.UNIT}
+                {exp=(Translate.whileLoop (#exp test_ty) (#exp body_ty)), ty = Types.UNIT}
             end
 
-          | trexp (A.ForExp {var, escape, lo, hi, body, pos}) =
+        | trexp (A.ForExp {var, escape, lo, hi, body, pos}) = 
             let
-                val lo_ty = trexp lo
-                val hi_ty = trexp hi
-                val access' = T.allocLocal level (!escape)
-                val venv' = Symbol.enter (venv, var, (Env.VarEntry {ty=Types.INT, access=access'}))
-                val body_ty = transExp (level, venv', tenv, body, LOOP)
+                val limit_sym = Symbol.symbol "limit"
+                val decs = [
+                    Absyn.VarDec {name=var, escape=escape, typ=NONE, init=lo, pos=pos},
+                    Absyn.VarDec {name=limit_sym, escape=escape, typ=NONE, init=hi, pos=pos}
+                ]
+                val exp_test = Absyn.OpExp{
+                    left=Absyn.VarExp (Absyn.SimpleVar (var, pos)),
+                    oper = Absyn.LeOp,
+                    right= Absyn.VarExp (Absyn.SimpleVar (limit_sym, pos)),
+                    pos=pos
+                    }
+                val whileExp = Absyn.WhileExp {test = exp_test, body=body, pos=pos}
+                val letExp = Absyn.LetExp {decs = decs, body=whileExp, pos=pos}
             in
-                checkInt(lo_ty, pos);
-                checkInt (hi_ty, pos);
-                checkUnit (body_ty, pos);
-                {exp=T.to_be_replaced, ty=Types.UNIT}
+                trexp letExp
             end
 
         and trvar (A.SimpleVar (id, pos)) =
@@ -326,9 +337,10 @@ fun transExp (level, venv, tenv, exp, context: context) =
 
           | trvar (A.SubscriptVar (var, exp, pos)) = (
             case (trvar var) of
-                {exp=_, ty = Types.ARRAY (var_ty, _)} => (
+                {exp=t_exp, ty = Types.ARRAY (var_ty, _)} => (
                         case (trexp exp) of
-                            {exp = _, ty = Types.INT} => {exp = T.to_be_replaced, ty=var_ty}
+                            {exp = index, ty = Types.INT} => {exp = (Translate.subscript t_exp index),
+                                                             ty=var_ty}
                             | _ => ((ErrorMsg.error pos "Array subscript type should be Integer");
                                                           {exp = T.to_be_replaced, ty = Types.NIL})
             )
@@ -338,11 +350,15 @@ fun transExp (level, venv, tenv, exp, context: context) =
 
           | trvar (A.FieldVar (var, sym, pos)) = (
               case (trvar var) of
-                  {exp = _, ty = (Types.RECORD (sym_list, _))} =>
+                  {exp = t_exp , ty = (Types.RECORD (sym_list, _))} =>
                             (case find_ty (sym, sym_list) of
-                                 SOME rc_ty => {exp = T.to_be_replaced, ty = rc_ty}
-                                                        | NONE => (ErrorMsg.error pos (Symbol.name sym ^ " not found in record");
-                                                                                  {exp = T.to_be_replaced, ty = Types.INT})
+                                 SOME rc_ty => let
+                                                    val record_index = Translate.intExp level (find_record_index sym sym_list pos 0)
+                                               in
+                                                {exp = (Translate.subscript t_exp record_index), ty = rc_ty}
+                                               end
+                                | NONE => (ErrorMsg.error pos (Symbol.name sym ^ " not found in record");
+                                            {exp = T.to_be_replaced, ty = Types.INT})
                             )
                           | _ => (ErrorMsg.error pos "Not a record type";
                                                  {exp = T.to_be_replaced, ty = Types.INT})
