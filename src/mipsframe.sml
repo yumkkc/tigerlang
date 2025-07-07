@@ -12,42 +12,71 @@ datatype access = InFrame of int | InReg of Temp.temp
 (* label here is memory label which starts the location *)
 type frame = { name: Temp.label,
                formals: (access * bool) list,
-               locals: (access * bool) list ref
+               locals: (access * bool) list ref,
+               totalFormals : int ref,
+               totalLocals : int ref
              }
 
 datatype frag = PROC of {body : Tree.stm, frame: frame}
                     | STRING of Temp.label * string
 
-fun assignMem() = InFrame 0 (* TODO: Change later *)
+fun assignMem index = InFrame  (index * wordSize)(* TODO: Change later *)
 
 fun assignReg() = InReg (Temp.newtemp())
 
-fun assignMemOrReg true = (assignMem(), true)
-  | assignMemOrReg false = (assignReg(), false)
+fun assignMemOrReg index true = (assignMem index, true)
+  | assignMemOrReg _ false = (assignReg(), false)
 
 (* first four gets assigned register *)
 val limit = 4
 
-fun assignParam [] _ = []
-  | assignParam (true::formals) count = (assignMem(), true)::(assignParam formals count)
-  | assignParam (false::formals) count = if (count <=limit) then (assignReg(), false)::(assignParam formals (count-1))
-                                       else (assignReg(), false) :: (assignParam formals (count-1))
+fun assignParam [] _ _= []
 
-fun newFrame {name, formals}: frame = {name = name,
-                                formals = (assignParam formals limit),
-                                locals = ref []}
+  | assignParam (true::formals) index count = 
+  let
+    val mem = assignMem (!index)
+  in
+    index := 1 + (!index);
+    (mem, true)::(assignParam formals index count)
+  end
+  
+  | assignParam (false::formals) index count =
+      if count <= limit then
+        (assignReg(), false)::(assignParam formals index (count+1))
+      else
+        let
+          val newformals = map (fn _ => true) formals
+        in
+          assignParam newformals index count
+        end
 
-fun name {name=name, formals=_, locals=_ } = name
 
-fun formals {name=_, formals=formals, locals=_} =
+fun newFrame {name, formals}: frame = 
+                      let
+                        val formalNum = ref 0
+                        val formals = (assignParam formals formalNum 0)
+                      in
+                                {name = name,
+                                formals = formals,
+                                locals = ref [],
+                                totalFormals = formalNum,
+                                totalLocals = ref 0
+                                }
+                      end
+
+
+fun name {name=name, formals=_, locals=_ , totalFormals=_, totalLocals=_} = name
+
+fun formals {name=_, formals=formals, locals=_,totalFormals=_, totalLocals=_} =
     (map (fn (access, _) => access) formals)
 
-fun allocLocal {name = _, formals=_, locals} isescape =
+fun allocLocal {name = _, formals=_, locals, totalFormals=_, totalLocals=localnum} isescape =
     let
-        val new_access = assignMemOrReg isescape
+        val new_access = assignMemOrReg (~(!localnum)) isescape
         val (access, _) = new_access
     in
         locals := new_access :: !locals;
+        localnum := 1 + (!localnum);
         access
     end
 

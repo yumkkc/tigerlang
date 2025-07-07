@@ -11,7 +11,6 @@ sig
     val name : frame -> Temp.label
     val formals: frame -> access list
     val allocLocal : frame -> bool -> access
-    val assignMemOrReg : bool -> access * bool
 
     (*important variables*)
     val FP: Temp.temp
