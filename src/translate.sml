@@ -2,6 +2,7 @@ signature TRANSLATE =
 sig
     type level
     type access
+    type fraglist
 
     datatype exp = Ex of Tree.exp
              | Nx of Tree.stm
@@ -50,6 +51,8 @@ datatype level = innerlevel of {parent : level,
                                 } | outermost
 
 type access = level * Frame.access
+
+type fraglist = Frame.frag list
 
 val fraglist : Frame.frag list ref = ref []
 

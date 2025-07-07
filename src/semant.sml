@@ -9,7 +9,7 @@ sig
 (*    val transVar: venv * tenv * Abysn.dec -> expty *)
     val transDecs: Translate.level * venv * tenv * Absyn.dec list * Translate.exp list * Temp.label option-> {venv: venv, tenv: tenv, exps: Translate.exp list}
     val transTy : tenv * Absyn.ty -> Types.ty
-    val transProg: Absyn.exp -> unit
+    val transProg: Absyn.exp -> Translate.fraglist
 end
 
 (* TODO: Function still refers to the parent level while processig the body. Fix that *)
@@ -20,7 +20,6 @@ struct
 structure E = Env
 structure A = Absyn
 structure T = Translate
-
 
 type expty = {exp: Translate.exp, ty: Types.ty}
 
@@ -530,9 +529,10 @@ and transProg exp =
     let
         (* first layer after outer *)
         val main_level = T.newLevel {parent=T.outermost, name=Symbol.symbol "main_level", formals=[]}
+        val {exp=final_exp, ty=_} = transExp (main_level, Env.base_venv, Env.base_tenv, exp, NONE)
     in
-        transExp (main_level, Env.base_venv, Env.base_tenv, exp, NONE);
-        ()
+        Translate.procEntryExit {level = main_level, body=final_exp};
+        Translate.getResult()
     end
 
 end
