@@ -2,13 +2,12 @@ signature SEMANT =
 sig
     type venv = Env.enventry Symbol.table
     type tenv = Types.ty Symbol.table
-    datatype context = LOOP | NOTLOOP
 
     type expty = {exp: Translate.exp, ty: Types.ty}
 
-    val transExp: Translate.level * venv * tenv * Absyn.exp * context  -> expty
+    val transExp: Translate.level * venv * tenv * Absyn.exp * Temp.label option  -> expty
 (*    val transVar: venv * tenv * Abysn.dec -> expty *)
-    val transDecs: Translate.level * venv * tenv * Absyn.dec list * Translate.exp list -> {venv: venv, tenv: tenv, exps: Translate.exp list}
+    val transDecs: Translate.level * venv * tenv * Absyn.dec list * Translate.exp list * Temp.label option-> {venv: venv, tenv: tenv, exps: Translate.exp list}
     val transTy : tenv * Absyn.ty -> Types.ty
     val transProg: Absyn.exp -> unit
 end
@@ -83,13 +82,8 @@ fun check_type_equality (ty1: Types.ty, ty2: Types.ty, pos, errormsg) =
           | false => ErrorMsg.error pos errormsg
     end
 
-
-
-datatype context = LOOP | NOTLOOP
-
-
 (* Absyn.exp *)
-fun transExp (level, venv, tenv, exp, context: context) =
+fun transExp (level, venv, tenv, exp, breakpoint: Temp.label option) =
     let
         fun check_arth_param (left, right, pos, oper) =
         let
@@ -169,17 +163,17 @@ fun transExp (level, venv, tenv, exp, context: context) =
 
           | trexp (A.IntExp arg) = {exp = (Translate.intExp level arg), ty = Types.INT}
 
-          | trexp  (A.StringExp arg) = {exp = T.to_be_replaced, ty = Types.STRING} (* TODO: Handle string later *)
+          | trexp  (A.StringExp (arg, _)) = {exp = (Translate.handleString arg), ty = Types.STRING} (* TODO: Handle string later *)
 
           | trexp (A.LetExp {decs, body, pos}) =
-              let val {venv=venv', tenv=tenv', exps=exps} = transDecs(level, venv, tenv, decs, [])
-              in transExp (level, venv', tenv', body, NOTLOOP)
+              let val {venv=venv', tenv=tenv', exps=exps} = transDecs(level, venv, tenv, decs, [], breakpoint)
+              in transExp (level, venv', tenv', body, breakpoint)
               end
 
-          | trexp (A.BreakExp pos) = (case context of
-                                     NOTLOOP => ((ErrorMsg.error pos "break statment not allowed here"); 
+          | trexp (A.BreakExp pos) = (case breakpoint of
+                                     NONE => ((ErrorMsg.error pos "break statment not allowed here"); 
                                      {exp=T.to_be_replaced, ty=Types.UNIT})
-                                   | LOOP => {exp=T.to_be_replaced, ty=Types.UNIT}
+                                   | SOME bp_label => {exp=(Translate.breakExp bp_label), ty=Types.UNIT}
                                  )
 
           | trexp (A.RecordExp {fields, typ, pos}) = (
@@ -297,11 +291,12 @@ fun transExp (level, venv, tenv, exp, context: context) =
 
           | trexp (A.WhileExp {test, body, pos}) =
             let val test_ty = trexp test
-                val body_ty = transExp (level, venv, tenv, body, LOOP)
+                val done_label = Temp.newlabel()
+                val body_ty = transExp (level, venv, tenv, body, SOME done_label)
             in
                 checkInt (test_ty, pos);
                 checkUnit (body_ty, pos);
-                {exp=(Translate.whileLoop (#exp test_ty) (#exp body_ty)), ty = Types.UNIT}
+                {exp=(Translate.whileLoop (#exp test_ty) (#exp body_ty) done_label), ty = Types.UNIT}
             end
 
         | trexp (A.ForExp {var, escape, lo, hi, body, pos}) = 
@@ -369,12 +364,12 @@ fun transExp (level, venv, tenv, exp, context: context) =
     end
 
 (* Absyn.dec *)
-and transDecs (level, venv, tenv, dec::decs, exps) =
+and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
     let
         (* variables declarations *)
 
         fun transDec (venv, tenv, A.VarDec {name, typ=NONE, init, escape, pos}) =
-            let val {exp, ty} = transExp(level, venv, tenv, init, NOTLOOP)
+            let val {exp, ty} = transExp(level, venv, tenv, init, bp)
                 val access' = T.allocLocal level (!escape)
             in {tenv = tenv,
                 venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty, access=access'}),
@@ -388,7 +383,7 @@ and transDecs (level, venv, tenv, dec::decs, exps) =
             case Symbol.look (tenv, sym_ty) of
                 SOME(res_ty) =>
                              let
-                                 val {exp, ty} = transExp(level, venv, tenv, init, NOTLOOP)
+                                 val {exp, ty} = transExp(level, venv, tenv, init, bp)
                                  val access' = T.allocLocal level (!escape)
                              in
                                 check_type_equality(ty, res_ty, pos,
@@ -478,9 +473,11 @@ and transDecs (level, venv, tenv, dec::decs, exps) =
                                 val result_ty = look_result_type (tenv, result)
                                 val params' = map (transparam tenv) params
                                 val venv'' = foldl enter_local_vars venv params'
-                                val {exp=_, ty=bodyty} = transExp (level, venv'', tenv, body, NOTLOOP)
+                                val {exp=f_body_exp, ty=bodyty} = transExp (level, venv'', tenv, body, bp)
                             in
-                                (check_type_equality (result_ty, bodyty, pos, (Symbol.name name ^ " function result type does not match return of expression")))
+                                Translate.procEntryExit {level=level, body=f_body_exp};
+                                (check_type_equality (result_ty, bodyty, pos, 
+                                    (Symbol.name name ^ " function result type does not match return of expression")))
                             end
                     in
                         app updateBody fundecs
@@ -505,10 +502,10 @@ and transDecs (level, venv, tenv, dec::decs, exps) =
 
         val {venv=venv', tenv=tenv', exps=exps'} = transDec (venv, tenv, dec)
     in
-        transDecs (level, venv', tenv', decs, exps)
+        transDecs (level, venv', tenv', decs, exps, bp)
     end
 
-  | transDecs  (level, venv, tenv, [], exps) = {venv=venv, tenv=tenv, exps=exps}
+  | transDecs  (_, venv, tenv, [], exps, _: Temp.label option) = {venv=venv, tenv=tenv, exps=exps}
 
 (* Absyn.ty *)
 and transTy (tenv, ty) =
@@ -535,7 +532,7 @@ and transProg exp =
         (* first layer after outer *)
         val main_level = T.newLevel {parent=T.outermost, name=Symbol.symbol "main_level", formals=[]}
     in
-        transExp (main_level, Env.base_venv, Env.base_tenv, exp, NOTLOOP);
+        transExp (main_level, Env.base_venv, Env.base_tenv, exp, NONE);
         ()
     end
 

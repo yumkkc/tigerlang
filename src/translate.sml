@@ -7,6 +7,7 @@ sig
              | Nx of Tree.stm
              | Cx of Temp.label * Temp.label -> Tree.stm
              | to_be_replaced
+    
 
     val outermost : level
     val newLevel : {parent : level, name: Temp.label,
@@ -25,8 +26,13 @@ sig
     val recordInit : level -> exp list -> exp
     val ifElseExp : exp -> exp -> exp -> exp
     val ifExp : exp -> exp -> exp
-    val whileLoop : exp -> exp -> exp
+    val whileLoop : exp -> exp -> Temp.label ->  exp
     val subscript : exp ->  exp -> exp
+    val procEntryExit : {level : level, body: exp} -> unit
+    val breakExp : Temp.label -> exp
+    structure Frame : FRAME
+    val getResult : unit -> Frame.frag list
+    val handleString : string -> exp
 
 end
 
@@ -44,6 +50,8 @@ datatype level = innerlevel of {parent : level,
                                 } | outermost
 
 type access = level * Frame.access
+
+val fraglist : Frame.frag list ref = ref []
 
 datatype exp = Ex of Tree.exp
              | Nx of Tree.stm
@@ -176,7 +184,8 @@ fun arthExpr exp1 exp2 (oper:Absyn.oper) =
         val t_exp1 = UnEx exp1
         val t_exp2 = UnEx exp2
         fun make_bin_op t_op = Ex (T.BINOP (t_op, t_exp1, t_exp2))
-        fun make_jump_op t_op = Cx (fn (t:Temp.label, f:Temp.label) => T.CJUMP (t_op, t_exp1, t_exp2, t, f))
+        fun make_jump_op t_op = Cx (fn (t:Temp.label, f:Temp.label) => 
+                                        T.CJUMP (t_op, t_exp1, t_exp2, t, f))
 
         fun arExp Absyn.PlusOp = make_bin_op T.PLUS
             | arExp Absyn.MinusOp = make_bin_op T.MINUS
@@ -325,9 +334,8 @@ fun recordInit curr_level (exp_list: exp list) =
             )
         end
 
-fun whileLoop test body = 
+fun whileLoop test body done_label= 
     let
-        val done_label = Temp.newlabel()
         val continue_label = Temp.newlabel()
         val test_cx = UnCx test
     in
@@ -345,6 +353,11 @@ fun whileLoop test body =
         )
     end
 
+fun breakExp donelabel = 
+    Nx (
+        T.JUMP ((T.NAME donelabel), [donelabel])
+    )
+
 fun subscript expr index = 
         Ex(
         T.MEM (
@@ -359,5 +372,33 @@ fun subscript expr index =
             )
         )   
         )
+
+fun handleString content = 
+    let
+        val str_label = Temp.newlabel()
+        val new_frag = Frame.STRING (str_label, content) 
+    in
+        fraglist := new_frag :: (!fraglist);
+        Ex (T.NAME str_label)
+    end
+
+
+fun procEntryExit {level=c_level, body=body} = 
+    let
+        val move_res = T.MOVE (T.TEMP Frame.RV, (UnEx body))
+    in
+        case c_level of
+            outermost => ErrorMsg.impossible "Cannot have function in outerlevel"
+            | innerlevel { parent=_, name=_, frame=this_frame, unique=_} => 
+                    let
+                        val final_res = Frame.procEntryExit1 (this_frame, move_res)
+                        val new_frag = Frame.PROC {body=final_res, frame=this_frame}
+                    in  
+                        fraglist := new_frag :: (!fraglist)                      
+                    end
+    end
+    
+
+fun getResult () = !fraglist
 
 end

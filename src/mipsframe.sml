@@ -4,6 +4,7 @@ structure T = Tree
 
 val wordSize = 8
 val FP = Temp.newtemp()
+val RV = Temp.newtemp() (* return register *)
 
 (* determines where the value will be stored -> register (temp) or memory (int) *)
 datatype access = InFrame of int | InReg of Temp.temp
@@ -13,6 +14,9 @@ type frame = { name: Temp.label,
                formals: (access * bool) list,
                locals: (access * bool) list ref
              }
+
+datatype frag = PROC of {body : Tree.stm, frame: frame}
+                    | STRING of Temp.label * string
 
 fun assignMem() = InFrame 0 (* TODO: Change later *)
 
@@ -53,20 +57,9 @@ fun exp (InFrame c) (fp: T.exp) =
   |  exp (InReg reg) (_: T.exp) = T.TEMP reg
 
 
-fun arrayMem index base_add = 
-  T.MEM (
-    T.BINOP (
-      T.PLUS, 
-      T.MEM base_add, 
-      T.BINOP (
-        T.MUL,
-        T.CONST index,
-        T.CONST wordSize
-        )
-      )
-    )
-
 fun externalCall (name: string) (args : Tree.exp list) = 
   T.CALL (T.NAME (Temp.namedlabel name), args)
+
+fun procEntryExit1 (c_frame, t_stm) = t_stm (* implement view shift later *)
 
 end
