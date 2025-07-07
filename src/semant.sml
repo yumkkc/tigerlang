@@ -450,29 +450,28 @@ and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
                                           )
                       | NONE => Types.UNIT
 
-                fun transparam tenv {name, typ, pos, escape} =
-                    case Symbol.look(tenv, typ) of
+                fun transparam tenv' {name, typ, pos, escape} =
+                    case Symbol.look(tenv', typ) of
                         SOME t => {name=name, ty=t, escape=escape}
                       | NONE => ((ErrorMsg.error pos (Symbol.name typ ^ " type not found"));
                                  {name=name, ty=Types.NIL, escape=escape})
 
-                fun updateBodys(venv, tenv) =
+                fun updateBodys(venv, tenv, fun_levels) =
                     let
-                        fun enter_local_vars ({name, ty, escape}, venv) =
-                            (* TODO: Change this for different levels *)
+                        fun enter_local_vars fun_level ({name, ty, escape}, venv') =
                             let
-                                val access' = T.allocLocal level (!escape)
+                                val access' = T.allocLocal fun_level (!escape)
                             in
-                                Symbol.enter (venv, name,
+                                Symbol.enter (venv', name,
                                               Env.VarEntry {ty=ty, access=access'})
                             end
 
 
-                        fun updateBody({name, params, body, pos, result}) =
+                        fun updateBody({name, params, body, pos, result}, fun_level) =
                             let
                                 val result_ty = look_result_type (tenv, result)
                                 val params' = map (transparam tenv) params
-                                val venv'' = foldl enter_local_vars venv params'
+                                val venv'' = foldl (enter_local_vars fun_level) venv params'
                                 val {exp=f_body_exp, ty=bodyty} = transExp (level, venv'', tenv, body, bp)
                             in
                                 Translate.procEntryExit {level=level, body=f_body_exp};
@@ -480,10 +479,10 @@ and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
                                     (Symbol.name name ^ " function result type does not match return of expression")))
                             end
                     in
-                        app updateBody fundecs
+                        (app updateBody o ListPair.zip) (fundecs, fun_levels)
                     end
                 (* initial function headers insertion -> {venv', tenv'}*)
-                fun enterFunctionHeaders({name, params, body, pos, result}, {venv, tenv}) =
+                fun enterFunctionHeaders({name, params, body, pos, result}, {venv, tenv, levels}) =
                     let
                         val result_ty = look_result_type (tenv, result)
                         val params' = map (transparam tenv) params
@@ -492,11 +491,11 @@ and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
                         val venv' = Symbol.enter (venv, name, E.FunEntry {formals = map #ty params',
                                                                           result=result_ty, level=new_level, label=fun_label})
                     in
-                        {venv=venv', tenv=tenv}
+                        {venv=venv', tenv=tenv, levels=new_level::levels}
                     end
-                val {venv=venv', tenv=tenv'} = foldl enterFunctionHeaders {venv=venv,tenv=tenv} fundecs
+                val {venv=venv', tenv=tenv',levels=levels'} = foldl enterFunctionHeaders {venv=venv,tenv=tenv, levels=[]} fundecs
             in
-                updateBodys(venv', tenv');
+                updateBodys(venv', tenv', (List.rev levels'));
                 {venv=venv', tenv=tenv', exps=exps}
             end
 
