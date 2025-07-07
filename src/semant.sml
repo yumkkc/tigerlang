@@ -7,7 +7,7 @@ sig
 
     val transExp: Translate.level * venv * tenv * Absyn.exp * Temp.label option  -> expty
 (*    val transVar: venv * tenv * Abysn.dec -> expty *)
-    val transDecs: Translate.level * venv * tenv * Absyn.dec list * Translate.exp list * Temp.label option-> {venv: venv, tenv: tenv, exps: Translate.exp list}
+    val transDecs: Translate.level * venv * tenv * Absyn.dec list * Translate.exp list ref * Temp.label option-> {venv: venv, tenv: tenv}
     val transTy : tenv * Absyn.ty -> Types.ty
     val transProg: Absyn.exp -> Translate.fraglist
 end
@@ -164,9 +164,13 @@ fun transExp (level, venv, tenv, exp, breakpoint: Temp.label option) =
 
           | trexp  (A.StringExp (arg, _)) = {exp = (Translate.handleString arg), ty = Types.STRING} (* TODO: Handle string later *)
 
-          | trexp (A.LetExp {decs, body, pos}) =
-              let val {venv=venv', tenv=tenv', exps=exps} = transDecs(level, venv, tenv, decs, [], breakpoint)
-              in transExp (level, venv', tenv', body, breakpoint)
+          | trexp (A.LetExp {decs, body, pos=_}) =
+              let 
+                val exps : Translate.exp list ref = ref []
+                val {venv=venv', tenv=tenv'} = transDecs(level, venv, tenv, decs, exps, breakpoint)
+                val {exp=body_exp, ty=let_ty} = transExp (level, venv', tenv', body, breakpoint)
+              in 
+                {exp=(Translate.letExp (!exps) body_exp), ty=let_ty}
               end
 
           | trexp (A.BreakExp pos) = (case breakpoint of
@@ -370,10 +374,11 @@ and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
         fun transDec (venv, tenv, A.VarDec {name, typ=NONE, init, escape, pos}) =
             let val {exp, ty} = transExp(level, venv, tenv, init, bp)
                 val access' = T.allocLocal level (!escape)
-            in {tenv = tenv,
-                venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty, access=access'}),
-                exps=(Translate.initVar access' level exp)::exps
-               }
+            in
+                exps := (Translate.initVar access' level exp) :: (!exps);
+                {tenv = tenv,
+                venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty, access=access'})
+                }
             end
 
          (* TODO: some more changes are required -> if type failed to add or not *)
@@ -387,13 +392,13 @@ and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
                              in
                                 check_type_equality(ty, res_ty, pos,
                                         ("result type of " ^ Symbol.name name ^ " and " ^ Symbol.name sym_ty ^ " does not match"));
+                                exps := (Translate.initVar access' level exp) :: (!exps);
                                  {tenv = tenv,
-                                  venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty, access=access'}),
-                                  exps=(Translate.initVar access' level exp)::exps
+                                  venv = Symbol.enter (venv, name, Env.VarEntry {ty=ty, access=access'})
                                  }
                              end
                | NONE => ((ErrorMsg.error sym_pos (Symbol.name sym_ty ^ " type not found"));
-                {venv=venv, tenv=tenv, exps=exps})
+                {venv=venv, tenv=tenv})
           )
 
           | transDec (venv, tenv, A.TypeDec declars) =
@@ -435,7 +440,7 @@ and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
                 val tenv' = foldr initialize tenv declars
             in
                 iterate_decs (venv, tenv');
-                {tenv=tenv', venv=venv, exps = exps}
+                {tenv=tenv', venv=venv}
             end
 
           | transDec (venv, tenv, A.FunctionDec fundecs) =
@@ -495,15 +500,15 @@ and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
                 val {venv=venv', tenv=tenv',levels=levels'} = foldl enterFunctionHeaders {venv=venv,tenv=tenv, levels=[]} fundecs
             in
                 updateBodys(venv', tenv', (List.rev levels'));
-                {venv=venv', tenv=tenv', exps=exps}
+                {venv=venv', tenv=tenv'}
             end
 
-        val {venv=venv', tenv=tenv', exps=exps'} = transDec (venv, tenv, dec)
+        val {venv=venv', tenv=tenv'} = transDec (venv, tenv, dec)
     in
         transDecs (level, venv', tenv', decs, exps, bp)
     end
 
-  | transDecs  (_, venv, tenv, [], exps, _: Temp.label option) = {venv=venv, tenv=tenv, exps=exps}
+  | transDecs  (_, venv, tenv, [], exps, _: Temp.label option) = {venv=venv, tenv=tenv}
 
 (* Absyn.ty *)
 and transTy (tenv, ty) =

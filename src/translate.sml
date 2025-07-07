@@ -23,6 +23,7 @@ sig
     val arthExpr : exp -> exp -> Absyn.oper -> exp
     val intExp : level -> int -> exp
     val callExp : Temp.label -> level -> level -> exp list -> exp
+    val letExp : exp list -> exp -> exp
     val initArray : level -> exp -> exp -> exp
     val recordInit : level -> exp list -> exp
     val ifElseExp : exp -> exp -> exp -> exp
@@ -215,6 +216,21 @@ fun callExp label curr_level func_level exp_list =
                 fun_static_link :: tree_exp_list
                 )
             )
+    end
+
+fun letExp exps body = 
+    case exps of 
+        [] => body
+        | _ => 
+            let
+                fun makeMoves [] = ErrorMsg.impossible "Cannot be reached."
+                   |makeMoves (x::[]) = x
+                   |makeMoves (x::xs) = T.SEQ (x, makeMoves xs)
+
+                val move_trees = map UnNx exps
+                val move_expr = makeMoves move_trees
+            in
+            Ex (T.ESEQ (move_expr, (UnEx body)))
     end
 
 fun externalCall name exps  = 
