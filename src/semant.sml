@@ -251,18 +251,19 @@ fun transExp (level, venv, tenv, exp, breakpoint: Temp.label option) =
                   SOME (Env.FunEntry {formals, result, level=func_level, label}) => 
                    let
                        fun check_type_param (formal::formals, arg::args) =
-                           let val {exp=t_exp, ty=t'} = trexp arg
+                           let 
+                                val {exp=t_exp, ty=t'} = trexp arg
                            in 
-                           (if not (actual_ty formal = actual_ty t') then
-                            (ErrorMsg.error pos "type does not match")                                   
-                            else ());
-                            t_exp :: check_type_param (formals, args)
+                            (if not (actual_ty formal = actual_ty t') then
+                                (ErrorMsg.error pos "type does not match")                                   
+                                else ());
+                                t_exp :: check_type_param (formals, args)
                            end
                          | check_type_param  ([], []) = []
                          | check_type_param (_, _) = (ErrorMsg.error pos (Symbol.name func ^ " length of parameters does not match the ones passed");
                           [])
-
-                      val t_exp_list =      check_type_param (formals, args)
+                        
+                        val t_exp_list =      check_type_param (formals, args)
                       val call_exp = Translate.callExp label level func_level t_exp_list
                        in
                            {exp=call_exp, ty=result}
@@ -462,23 +463,19 @@ and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
 
                 fun updateBodys(venv, tenv, fun_levels) =
                     let
-                        fun enter_local_vars fun_level ({name, ty, escape}, venv') =
-                            let
-                                val access' = T.allocLocal fun_level (!escape)
-                            in
+                        fun enter_local_vars (({name, ty, escape=_}, access'), venv') =
                                 Symbol.enter (venv', name,
                                               Env.VarEntry {ty=ty, access=access'})
-                            end
-
 
                         fun updateBody({name, params, body, pos, result}, fun_level) =
-                            let
+                            let 
                                 val result_ty = look_result_type (tenv, result)
                                 val params' = map (transparam tenv) params
-                                val venv'' = foldl (enter_local_vars fun_level) venv params'
-                                val {exp=f_body_exp, ty=bodyty} = transExp (level, venv'', tenv, body, bp)
+                                val param_access = T.formals fun_level
+                                val venv'' = foldl enter_local_vars venv (ListPair.zip (params', param_access))
+                                val {exp=f_body_exp, ty=bodyty} = transExp (fun_level, venv'', tenv, body, bp)
                             in
-                                Translate.procEntryExit {level=level, body=f_body_exp};
+                                Translate.procEntryExit {level=fun_level, body=f_body_exp};
                                 (check_type_equality (result_ty, bodyty, pos, 
                                     (Symbol.name name ^ " function result type does not match return of expression")))
                             end
@@ -493,9 +490,10 @@ and transDecs (level, venv, tenv, dec::decs, exps, bp: Temp.label option) =
                         val fun_label = Temp.newlabel()
                         val new_level = T.newLevel {parent=level, name=fun_label, formals= map (! o #escape) params'}
                         val venv' = Symbol.enter (venv, name, E.FunEntry {formals = map #ty params',
-                                                                          result=result_ty, level=new_level, label=fun_label})
+                                                                          result=result_ty, level=level, label=fun_label})
+                        val levels' = new_level :: levels
                     in
-                        {venv=venv', tenv=tenv, levels=new_level::levels}
+                        {venv=venv', tenv=tenv, levels=levels'}
                     end
                 val {venv=venv', tenv=tenv',levels=levels'} = foldl enterFunctionHeaders {venv=venv,tenv=tenv, levels=[]} fundecs
             in

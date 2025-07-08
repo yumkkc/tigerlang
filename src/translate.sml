@@ -1,6 +1,6 @@
 signature TRANSLATE =
 sig
-    type level
+    (* type level *)
     type access
     type fraglist
 
@@ -9,8 +9,13 @@ sig
              | Cx of Temp.label * Temp.label -> Tree.stm
              | to_be_replaced
     
-
-    val outermost : level
+    structure Frame : FRAME
+    (* val outermost : level *)
+    datatype level = innerlevel of {parent : level,
+                                name: Temp.label,
+                                frame: Frame.frame,
+                                unique: unit ref
+                                } | outermost
     val newLevel : {parent : level, name: Temp.label,
                    formals: bool list} -> level
     val allocLocal: level -> bool -> access
@@ -31,8 +36,7 @@ sig
     val whileLoop : exp -> exp -> Temp.label ->  exp
     val subscript : exp ->  exp -> exp
     val procEntryExit : {level : level, body: exp} -> unit
-    val breakExp : Temp.label -> exp
-    structure Frame : FRAME
+    val breakExp : Temp.label -> exp    
     val getResult : unit -> Frame.frag list
     val handleString : string -> exp
 
