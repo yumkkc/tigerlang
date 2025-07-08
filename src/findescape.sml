@@ -79,12 +79,12 @@ and traverseDecs (env, d, decs: Absyn.dec list): escEnv =
             let
                 fun process_fundec {name, params, result, body, pos} =
                     let
+                        val d' = d + 1
                         fun process_params ({name, escape, typ, pos}, env') =
                             (escape := false;
-                             Symbol.enter (env',  name ,(d, escape))
+                             Symbol.enter (env',  name ,(d', escape))
                             )
                         val env' = foldl process_params env params
-                        val d' = d + 1
                     in
                         traverseExp (env', d', body)
                     end
