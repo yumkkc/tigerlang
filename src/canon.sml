@@ -2,12 +2,15 @@ signature CANON =
 sig
     val linearize: Tree.stm -> Tree.stm list
     val basicBlock : Tree.stm list -> (Tree.stm list list * Temp.label)
-    (* val traceSchedule : Tree.stm list list * Temp.label -> Tree.stm list *)
+    val traceSchedule : Tree.stm list list * Temp.label -> Tree.stm list
 end
 
 structure Canon :> CANON =  struct
 
 structure T = Tree
+type block = Tree.stm list
+
+val block_label_map: (block * bool ref) Symbol.table = Symbol.empty
 
 val nop = T.EXP(T.CONST 0)
 
@@ -110,7 +113,10 @@ let
     val done = Temp.newlabel()
     fun split (stm1::stm2::rest) blocks = (
         case (stm1, stm2, blocks) of
-            (((T.JUMP _)|(T.CJUMP _)), T.LABEL _, block::blocks') => 
+          (* for the first *)
+          (T.LABEL _, _, []::blocks') => split (stm2::rest) ([stm1]::blocks')          
+          | (_, _, []::blocks') => split (stm2::rest) (((T.LABEL (Temp.newlabel())) :: [stm1])::blocks')
+          | (((T.JUMP _)|(T.CJUMP _)), T.LABEL _, block::blocks') => 
                 split rest ([stm2]::(block @ [stm1])::blocks')
           | (((T.JUMP _)|(T.CJUMP _)), _, block::blocks') =>
                 let
@@ -141,5 +147,50 @@ let
 in
     (List.rev(split stms [[]]), done)
 end
+
+fun traceSchedule (blocks, done_label) = 
+    let
+        fun build_map (b, block_map) = 
+            case b of
+                (T.LABEL lab)::_ => ((print ("entering " ^ Symbol.name lab)); Symbol.enter (block_map, lab, (b, ref false)))
+                | _ => ErrorMsg.impossible "Block does not start with a label"
+
+        val block_map' = foldl build_map block_label_map blocks
+        val block_map = Symbol.enter (block_map', done_label, ([], ref false))
+
+        fun get_jump (b:: []) = b
+            | get_jump (_::bs) = get_jump bs
+            | get_jump [] = ErrorMsg.impossible "Empty blocks"
+
+        fun follow_block lab trace = 
+                if (lab = done_label) then trace 
+                else
+                    let
+                        val (cur_block, marked) = case Symbol.look (block_map, lab) of
+                            SOME pair => pair
+                        | NONE => ErrorMsg.impossible ("Label not found in block_map  " ^ (Symbol.name lab))
+                        val jump_stm = case (get_jump  cur_block) of
+                                            (T.JUMP (T.NAME s, _)) => s
+                                            (* TODO: when there is no false, make it true but convert the statement CJUMP *)
+                                        | (T.CJUMP (_, _, _, tl, fl)) => fl
+                                        | _ => ErrorMsg.impossible "Block does not end with Jumps"
+                    in
+                        if (!marked) then trace
+                        else (
+                            (marked := true);
+                            (follow_block jump_stm (trace @ cur_block))
+                        )
+                    end
+
+        fun build_trace (b::bs) trace = (
+            case b of
+                (T.LABEL lab) :: _ => let val trace'= follow_block lab []
+                                      in (build_trace bs (trace @ trace')) end
+                | _ => ErrorMsg.impossible "Block does not start with  a label"
+        )
+          | build_trace [] trace = trace
+    in  
+        (build_trace blocks [])
+    end
 
 end

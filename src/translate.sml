@@ -322,11 +322,14 @@ fun recordInit curr_level (exp_list: exp list) =
                 T.SEQ(
                 T.JUMP (T.NAME final_jump, [final_jump]),
                 T.SEQ (
+                    T.LABEL f_label,
+                    T.SEQ(
                     T.MOVE (T.TEMP res_temp, t_false_exp),
                     T.SEQ (
                         T.JUMP (T.NAME final_jump, [final_jump]),
                         T.LABEL final_jump
                     )
+                )
                 )
                 )
                 )
