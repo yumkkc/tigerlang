@@ -1,5 +1,5 @@
 let
     var a := 5
 in
-    a
+    if (a = 5) then 5 else 6
 end

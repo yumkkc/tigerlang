@@ -1,7 +1,7 @@
 signature CANON = 
 sig
     val linearize: Tree.stm -> Tree.stm list
-    (*val basicBlock : Tree.stm list -> (Tree.stm list list * Temp.label)*)
+    val basicBlock : Tree.stm list -> (Tree.stm list list * Temp.label)
     (* val traceSchedule : Tree.stm list list * Temp.label -> Tree.stm list *)
 end
 
@@ -104,4 +104,42 @@ let
 in
           linear (stm', nil)
 end
+
+fun basicBlock (stms: Tree.stm list) =
+let
+    val done = Temp.newlabel()
+    fun split (stm1::stm2::rest) blocks = (
+        case (stm1, stm2, blocks) of
+            (((T.JUMP _)|(T.CJUMP _)), T.LABEL _, block::blocks') => 
+                split rest ([stm2]::(block @ [stm1])::blocks')
+          | (((T.JUMP _)|(T.CJUMP _)), _, block::blocks') =>
+                let
+                    val new_label = Temp.newlabel()
+                in
+                    split rest (((T.LABEL new_label)::[stm2])::(block @ [stm1]) :: blocks')
+                end
+          | (_, T.LABEL lab, block::blocks') =>
+                let
+                    val new_jump = T.JUMP ((T.NAME lab), [lab])
+                in
+                    split rest ([stm2] :: (block @ (stm1 ::[new_jump])) :: blocks')
+                end   
+          | (_, _, block::blocks') => split (stm2::rest) ((block @ [stm1]) :: blocks')
+
+          | (_, _, _ ) => ErrorMsg.impossible "Impossible situation for blocks to be null"
+    )
+      | split (stm::[]) (block::blocks) = (case stm of
+                            ((T.JUMP _) | (T.CJUMP _)) => let val new_label = Temp.newlabel()
+                                                        in (split (stm :: [(T.LABEL new_label)]) (block::blocks)) end
+                            | (T.LABEL lab) => let val new_jump = T.JUMP ((T.NAME lab), [lab])
+                                                in (split (stm :: [new_jump]) (block::blocks)) end
+                            | _ => split [] ((block @ [stm])::blocks)
+        )
+
+      | split [] (block::blocks) = (block @ [(T.JUMP (T.NAME done, [done]))]) :: blocks
+      | split _ _ = ErrorMsg.impossible "Cannot happen when all basicBlock is empty"
+in
+    (List.rev(split stms [[]]), done)
+end
+
 end
