@@ -106,9 +106,9 @@ fun transExp (level, venv, tenv, exp, breakpoint: Temp.label option) =
                 val exp_res = Translate.arthExpr exp_left exp_right A.EqOp
             in
                 case (ltype, rtype) of
-                    (Types.INT, Types.INT) => {exp = T.to_be_replaced, ty=Types.INT}
-                    | (Types.RECORD _, Types.RECORD _) => {exp = T.to_be_replaced, ty=Types.INT}
-                    | (Types.ARRAY _, Types.ARRAY _) => {exp = T.to_be_replaced, ty=Types.INT}
+                    (Types.INT, Types.INT) => {exp = exp_res, ty=Types.INT}
+                    | (Types.RECORD _, Types.RECORD _) => {exp = exp_res, ty=Types.INT}
+                    | (Types.ARRAY _, Types.ARRAY _) => {exp = exp_res, ty=Types.INT}
                     | (_, _) => ((ErrorMsg.error pos "Cannot compare the two expression");
                                                     {exp = exp_res, ty=Types.NIL})
             end
@@ -241,8 +241,10 @@ fun transExp (level, venv, tenv, exp, breakpoint: Temp.label option) =
                   | loop ((exp, _)::[]) = trexp exp
                   | loop ((exp, _)::exps) = ((trexp exp);
                                         loop exps )
+
+                val {exp=exp', ty=ty'} = loop exps                                   
             in
-                loop exps
+                {exp=exp', ty=ty'}
             end
 
           | trexp  (A.CallExp {func, args, pos}) =
@@ -275,7 +277,7 @@ fun transExp (level, venv, tenv, exp, breakpoint: Temp.label option) =
           | trexp (A.IfExp {test, then', else'=SOME(els_exp), pos}) =
             let
                 val testA = trexp test
-                val {exp = then_exp, ty = thenA} = trexp test
+                val {exp = then_exp, ty = thenA} = trexp then'
                 val {exp = else_exp, ty = elseA} = trexp els_exp
             in
                 checkInt(testA, pos);
