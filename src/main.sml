@@ -8,14 +8,14 @@ fun main filename =
         val frag_lists = Semant.transProg ast
         fun print_linear (exp::exps) = 
             ((Printtree.printtree(TextIO.stdOut, exp));
-                    print("+++++++++++++++++++++++++\n\n");
+                    print(" ===> ");
             print_linear exps)
-            | print_linear [] = print("finish\n")
+            | print_linear [] = print("\n--------------------------------------------\n")
 
         fun print_blocks (block::blocks) = ((print_linear block);
                                                                         (print "next block\n");
                                                                         print_blocks blocks)
-        |  print_blocks [] = print("finish priting blocks")
+        |  print_blocks [] = print("finish priting blocks\n\n")
 
         fun print_frag [] = ()
             | print_frag (frag::frags) =
@@ -23,15 +23,19 @@ fun main filename =
                     val Frame.PROC o_frag = frag
                     val frag_main = (#body o_frag)
                     val linearized = Canon.linearize frag_main
-                    val (blocks, _) = Canon.basicBlock linearized
+                    val blocks = Canon.basicBlock linearized
+                    val (blocks', _) = blocks
+                    val traces = Canon.traceSchedule blocks
+
                 in
                     Printtree.printtree (TextIO.stdOut, (#body o_frag));
                     print("-----------------------\n\n");
                     print_linear linearized;
                     print_frag frags;
                     print("Block priting !!!!\n");
-                   print_blocks blocks
-
+                   print_blocks blocks';
+                   print("traces printing\n\n");
+                   print_linear traces
                 end
         in
         print_frag frag_lists

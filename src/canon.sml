@@ -152,7 +152,7 @@ fun traceSchedule (blocks, done_label) =
     let
         fun build_map (b, block_map) = 
             case b of
-                (T.LABEL lab)::_ => ((print ("entering " ^ Symbol.name lab)); Symbol.enter (block_map, lab, (b, ref false)))
+                (T.LABEL lab)::_ => Symbol.enter (block_map, lab, (b, ref false))
                 | _ => ErrorMsg.impossible "Block does not start with a label"
 
         val block_map' = foldl build_map block_label_map blocks
@@ -162,6 +162,32 @@ fun traceSchedule (blocks, done_label) =
             | get_jump (_::bs) = get_jump bs
             | get_jump [] = ErrorMsg.impossible "Empty blocks"
 
+        fun decide_cjump t_label f_label blk op' a b =
+            let
+                val SOME (t_block,t_mark) = Symbol.look (block_map, t_label)
+                val SOME (f_block,f_mark) = Symbol.look (block_map, f_label)
+            in
+                case (!t_mark, !f_mark) of
+                    (_, false) => (blk, f_label)
+
+                    | (false, true) => let
+                                        val new_cjump = T.CJUMP ((Tree.notRel op'), a, b, f_label, t_label)
+                                        val blk' = List.rev (new_cjump :: (tl (List.rev blk)))
+                                    in
+                                        (blk', t_label)
+                                    end
+
+                     | (true, true) => 
+                                let
+                                    val f_label' = Temp.newlabel()
+                                    val c_jump' = T.CJUMP (op', a, b, f_label', t_label)
+                                    val new_block = [T.LABEL f_label', T.JUMP ((T.NAME f_label), [f_label])]
+                                    val blk' = List.rev(c_jump' :: (tl (List.rev blk)))
+                                in
+                                    ((blk' @ new_block), f_label)
+                                end
+            end
+
         fun follow_block lab trace = 
                 if (lab = done_label) then trace 
                 else
@@ -169,18 +195,19 @@ fun traceSchedule (blocks, done_label) =
                         val (cur_block, marked) = case Symbol.look (block_map, lab) of
                             SOME pair => pair
                         | NONE => ErrorMsg.impossible ("Label not found in block_map  " ^ (Symbol.name lab))
-                        val jump_stm = case (get_jump  cur_block) of
-                                            (T.JUMP (T.NAME s, _)) => s
-                                            (* TODO: when there is no false, make it true but convert the statement CJUMP *)
-                                        | (T.CJUMP (_, _, _, tl, fl)) => fl
-                                        | _ => ErrorMsg.impossible "Block does not end with Jumps"
-                    in
-                        if (!marked) then trace
-                        else (
-                            (marked := true);
-                            (follow_block jump_stm (trace @ cur_block))
-                        )
-                    end
+                        in
+                            if (!marked) then trace
+                            else 
+                            case (get_jump  cur_block) of
+                                    T.JUMP (T.NAME s, _) => ((marked := true);
+                                                            (follow_block s (trace @ cur_block)))
+                                                | (T.CJUMP (op', a, b, tl, fl)) =>
+                                                    let val (block', l) = (decide_cjump tl fl cur_block op' a b)
+                                                    in (follow_block l (trace @ block')) end
+
+                                                | _ => ErrorMsg.impossible "Block does not end with Jumps"
+                        end
+        
 
         fun build_trace (b::bs) trace = (
             case b of
