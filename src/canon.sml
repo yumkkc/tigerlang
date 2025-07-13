@@ -217,7 +217,7 @@ fun traceSchedule (blocks, done_label) =
         )
           | build_trace [] trace = trace
     in  
-        (build_trace blocks [])
+        (build_trace blocks []) @ [T.LABEL done_label]
     end
 
 end
