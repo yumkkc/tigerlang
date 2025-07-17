@@ -1,5 +1,6 @@
 let
-    var a := 5
+    var a := 6
+    function test (b:int):int = b
 in
-    if (a = 5) then 5 else 6
+    test (8)
 end

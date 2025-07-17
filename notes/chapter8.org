@@ -1,0 +1,158 @@
+#+TITLE: BLOCKS and Traces
+
+* Summary
+
+After the language is parsed to IR, we cannot directly convert it to the Assembly because of ESEQ and SEQ. We want to able to execute expressions in any order which is why ESEQ is bad.
+
+Also, there is CALL function which is problematic when used in like other function calls.
+
+Another problem is the CJUMP. Usually in the Assembly, if the condition is false, it just moves it into the next instruction
+
+CALL (LABEL A, [CALL B.... CALL C....]) => Both the CALL B and CALL C wwrites to the same register. Therefore, we should first store them in the temporary variables. 
+
+To eliminate all of these, we eliminate all the ESEQ, transform all the CALLS and then remove SEQ to make a list of Tree.stm
+
+At the end, we arrage all of these into BLOCKs such that:
+1. The block start with a LABEL
+2. The block gets executed
+3. The exit is a JUMP to the next block
+
+All of the blocks are then arragend such that all of the JUMP's false coming one after another. This is called trace.
+
+
+* CANONICAL TREES
+
+Properties of CANONICAL trees are: 
+    1. No SEQ or ESEQ
+    2. The parent of each CALL is either EXP(...) or MOVE (TEMP t, ...)
+
+
+* Transformation on ESEQ
+
+#+BEGIN_SRC sml
+fun commute (T.EXP (T.CONST, _), _ ) = true
+    | commute (_, T.NAME _) = true
+    | commute (_, T.CONST _) = true
+    | commute _ = false
+#+END_SRC
+
+We first check if the expressions commute of not and then decide the rewriting rule
+
+[e1, e2, ESEQ(s, e3)] can be written in following ways:
+
+1. all commuting => (s; [e1,e2,e3])
+2. all non-commuting => (SEQ(MOVE (t1, e1), SEQ (MOVE (t2, e2), s)); [TEMP(t1), TEMP(t2), e3])
+
+3. If only e2 commutes with s but not e1
+
+(SEQ(MOVE (t1, e1), s); [TEMP(t1), e2, e3])
+
+* Transformation of CALL
+
+The CALL expression can be used in expressions. But the implementation is such that, the return values is always in the same register. Therefore, we need to store the return value in a temporary variable.
+
+for example:
+BINOP (PLUS, CALL(...), CALL(...))
+
+CALL (fun, args) -> ESEQ(MOVE (TEMP t, CALL(fun, args)), TEMP t)
+
+The above transformation is again send to elinate the ESEQ. 
+
+we should keep one thing in mind that the call to reorder when it sees -> MOVE (TEMP t, CALL(fun,args)), will not see CALL but will think fun and args are the child of the MOVE.
+
+Thus, reorder never "sees" any CALL that is child of MOVE or EXP.
+
+Excercises:
+
+8.1 
+
+a. move (temp t, eseq (s,e)) => seq (s, move (temp t, e))
+
+b. move (mem (eseq (s, e1)), e2 ) => seq (s, move (mem e1, e2))
+
+c. move (mem e1, eseq (s, e2)) => seq (move (temp t, e1), seq (s , move (mem (temp t), e2)))
+
+d. EXP (ESEQ (s , e)) => SEQ (s, EXP (e))
+
+e. EXP (CALL (ESEQ (s, e), args)) => SEQ (s, EXP (CALL (e, args)))
+
+f. MOVE (TEMP t, CALL (ESEQ (s, e), args)) => move (temp t, eseq (move (temp t1, call (eseq(s, e), args)), temp t1))
+                                           => move (temp t, eseq (seq (s, move (temp t1 , call (e, args))), temp t1))
+                                           => seq (seq (s, move (temp t1 , call (e, args))), move (temp t, temp t1))
+
+
+g. EXP (CALL e1, [e2, ESEQ (s, e3), e4]) => 
+    SEQ (MOVE (t1, e1), SEQ (MOVE (t2, e2), SEQ s, EXP (CALL t1, [temp t2, e3, e4])));
+
+
+* A LINEAR LIST OF STATEMENTS
+
+seq (seq (a , b), c) => seq (a, seq (b , c))
+
+#+BEGIN_SRC sml
+
+    fun linear (T.SEQ (a, b), l) = linear (a, linear(b, l))
+        | linear (s, l) = s :: l
+
+#+END_SRC
+
+for seq (a, seq (b, seq (c, d)))
+
+linear (seq (a, seq (b, seq (c, d)))) nil
+
+ => [a; b; c; d]
+
+ * BASIC BLOCKS
+
+the basic block is a sequence of statements that is always entered at the beginning and exited at the end
+
+1. the first statement is a LABEL
+2. the last statement is a jump of CJUMP
+3. There are no other labels, jumps or cjumps
+
+** Algorithm for dividing the above list of statements into basic blocks is:
+
+iterate till it finds a label or a jump.
+if found, start a new block
+
+we add a "epilogue" at the end of the last block. We add a lable "done" to this. we jump from the last block
+with JUMP (NAME done)
+
+ * TRACES
+
+ Now the blocks can be arranged in any order because now it has labels and jumps
+
+ the flow of the program will be similar
+
+ Thus, we can order the blocks to satisfy the condition of the CJUMP "is followed by the false label"
+
+ ** algorithm
+
+ a simple algorithm that goes from one block to the other. If we start with b1 and be jumpts to b5 and then b5 jumps to b7
+
+ out trace will be [b1 b5 b7]
+
+ if b7 ends with the conditional jump to b8 or b9. Then we have a chocie -> add b8 and make b9 a new trace
+
+ or add b9 and make b8 a new trace. Several factor depends like the length of the trace and what not.
+
+ *** NOTE: In tiger, one block is there in only one trace.
+
+
+ * FINISHING UP
+
+ We then flatten all the traces in one list of consicutive statements
+
+ at this point, most of the CJUMP will be following the false label
+
+ if not:
+
+  - > if followed by true, make the conditoin of CJUMP as negation and change the label to false
+  - > if CJUMP follows neither, (because lets say it was already marked that is it is in another trace)
+        we invent a new false label lf' and rewrite the single CJUMP statemnt as three statements just to achive the conditoin
+
+        CJUMP (cond, a, b, lt, l'f)
+        LABEL l'f
+        JUMP (NAME lf)
+
+        

@@ -1,0 +1,46 @@
+#+title: Instruction Selection
+
+IR only represents one type of operation in its node unlike a real assembly which can have multiple operation in the single instructions. Thus, we need to map the group of operations in the IR (tree) to a instruction. This is tiling.
+
+- We represent a machine instruction as a fragment of an IR tree called a tree pattern.
+- This, the instruction selection becomes the task of tiling the tree with a minimal set of tree patterns
+
+*  Optimal vs Optimum
+- An Optimum tiling as the one whole tiles sum to the lowest possible value
+- An Optimal tiling is one where no two adjacent tiles can be combined into a single tile of lower cost.
+
+
+** MAXIMUL MUNCH
+
+- maximul munch is the algorithm for the optimal tiling.
+- We start from the largest "tree" covering the node and then call its child for others
+
+*** Implementation
+
+This is quite simple
+
+- We create two functions: /munchStm/ and /munchExp/
+- Pattern match should happend in the order of tiles preference (biggest tiles first)
+
+
+** Abstract Assembly
+
+#+begin_src sml
+
+structure Assem:
+          sig
+              type reg = string
+              type temp = Temp.temp
+              type label = Temp.label
+
+              datatype instr = OPER of {assem: string,
+                                       dst: temp list,
+                                       src: temp list,
+                                       jump: label list option}
+                     | LABEL of {assem: string, lab: Temp.label}
+                     | MOVE of {assem string, dst: temp, src: temp}
+
+              val format: (temp -> string) -> instr -> string
+          end
+
+#+end_src
