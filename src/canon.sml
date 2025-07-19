@@ -134,11 +134,12 @@ let
 
           | (_, _, _ ) => ErrorMsg.impossible "Impossible situation for blocks to be null"
     )
+      | split (stm::[]) ([] :: blocks')= split [] (((T.LABEL (Temp.newlabel())) :: [stm])::blocks')
       | split (stm::[]) (block::blocks) = (case stm of
                             ((T.JUMP _) | (T.CJUMP _)) => let val new_label = Temp.newlabel()
                                                         in (split (stm :: [(T.LABEL new_label)]) (block::blocks)) end
                             | (T.LABEL lab) => let val new_jump = T.JUMP ((T.NAME lab), [lab])
-                                                in (split (stm :: [new_jump]) (block::blocks)) end
+                                                in (split (new_jump :: [stm]) (block::blocks)) end
                             | _ => split [] ((block @ [stm])::blocks)
         )
 
@@ -156,6 +157,7 @@ fun traceSchedule (blocks, done_label) =
                 | _ => ErrorMsg.impossible "Block does not start with a label"
 
         val block_map' = foldl build_map block_label_map blocks
+        (* entering the last done label *)
         val block_map = Symbol.enter (block_map', done_label, ([], ref false))
 
         fun get_jump (b:: []) = b

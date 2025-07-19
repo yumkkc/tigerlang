@@ -5,9 +5,12 @@ structure T = Tree
 val wordSize = 8
 val FP = Temp.newtemp()
 val RV = Temp.newtemp() (* return register *)
+val SP = Temp.newtemp()
+val RA = Temp.newtemp()
 
 (* determines where the value will be stored -> register (temp) or memory (int) *)
 datatype access = InFrame of int | InReg of Temp.temp
+type register = string
 
 (* label here is memory label which starts the location *)
 type frame = { name: Temp.label,
@@ -19,6 +22,27 @@ type frame = { name: Temp.label,
 
 datatype frag = PROC of {body : Tree.stm, frame: frame}
                     | STRING of Temp.label * string
+
+val special_regs = [
+  (FP, "$fp"),
+  (RV, "$v0"),
+  (SP, "$sp"),
+  (RA, "$ra")
+]                
+
+fun entryenv ((id, data), env) =
+    Temp.Table.enter (env, id , data)
+
+fun make_many_temps times = 
+  if times = 0 then []
+  else Temp.newtemp() :: (make_many_temps (times - 1))    
+
+val args_reg_list = make_many_temps 4
+
+val final_regs = special_regs @ (ListPair.zip (args_reg_list, ["$a0", "$a1", "$a2", "$a3"]))
+
+val calldefs = args_reg_list @ [RV, RA]
+
 
 fun assignMem index = InFrame  (index * wordSize)(* TODO: Change later *)
 
@@ -42,7 +66,7 @@ fun assignParam [] _ _= []
   
   | assignParam (false::formals) index count =
       if count <= limit then
-        (assignReg(), false)::(assignParam formals index (count+1))
+        (InReg (List.nth (args_reg_list, !index)), false)::(assignParam formals index (count+1))
       else
         let
           val newformals = map (fn _ => true) formals

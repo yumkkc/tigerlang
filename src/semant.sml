@@ -265,7 +265,7 @@ fun transExp (level, venv, tenv, exp, breakpoint: Temp.label option) =
                          | check_type_param (_, _) = (ErrorMsg.error pos (Symbol.name func ^ " length of parameters does not match the ones passed");
                           [])
                         
-                        val t_exp_list =      check_type_param (formals, args)
+                        val t_exp_list = check_type_param (formals, args)
                       val call_exp = Translate.callExp label level func_level t_exp_list
                        in
                            {exp=call_exp, ty=result}
@@ -274,7 +274,7 @@ fun transExp (level, venv, tenv, exp, breakpoint: Temp.label option) =
                             {exp=T.to_be_replaced, ty=Types.NIL})
           )
 
-          | trexp (A.IfExp {test, then', else'=SOME(els_exp), pos}) =
+          | trexp (A.IfExp {test, then', else'=SOME els_exp, pos}) =
             let
                 val testA = trexp test
                 val {exp = then_exp, ty = thenA} = trexp then'
@@ -288,7 +288,7 @@ fun transExp (level, venv, tenv, exp, breakpoint: Temp.label option) =
           | trexp (A.IfExp {test, then', else'= NONE, pos}) =
             let
                 val testA = trexp test
-                val thenA = trexp test
+                val thenA = trexp then'
             in
                 checkInt(testA, pos);
                 checkUnit(thenA, pos);

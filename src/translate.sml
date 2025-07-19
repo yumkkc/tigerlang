@@ -40,6 +40,12 @@ sig
     val getResult : unit -> Frame.frag list
     val handleString : string -> exp
 
+    (* for assem *)
+    val getArgReg: unit -> Temp.temp list
+    val SP: Temp.temp
+    val wordsize : int
+    val calldefs : Temp.temp list
+
 end
 
 
@@ -54,6 +60,8 @@ datatype level = innerlevel of {parent : level,
                                 frame: Frame.frame,
                                 unique: unit ref
                                 } | outermost
+val SP = Frame.SP     
+val wordsize = Frame.wordSize                           
 
 type access = level * Frame.access
 
@@ -426,5 +434,9 @@ fun procEntryExit {level=c_level, body=body} =
     
 
 fun getResult () = !fraglist
+
+fun getArgReg () = Frame.args_reg_list
+
+val calldefs = Frame.calldefs
 
 end

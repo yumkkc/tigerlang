@@ -2,6 +2,7 @@ signature FRAME =
 sig
     type frame
     type access
+    type register
     val newFrame : {name : Temp.label,
                    formals: bool list} -> frame
 
@@ -16,8 +17,12 @@ sig
     val FP: Temp.temp
     val wordSize: int
     val RV : Temp.temp
+    val SP : Temp.temp
     (* expression for IR *)
     val exp : access -> Tree.exp -> Tree.exp
     val externalCall: string -> Tree.exp list -> Tree.exp
     val procEntryExit1 : frame * Tree.stm -> Tree.stm (* implement some view shift here *)
+    val tempMap: register Temp.Table.table
+    val args_reg_list : Temp.temp list
+    val calldefs : Temp.temp list
 end
