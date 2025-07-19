@@ -61,7 +61,8 @@ datatype level = innerlevel of {parent : level,
                                 frame: Frame.frame,
                                 unique: unit ref
                                 } | outermost
-val SP = Frame.SP     
+val SP = Frame.SP
+val FP = Frame.FP
 val wordsize = Frame.wordSize                           
 
 type access = level * Frame.access

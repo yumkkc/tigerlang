@@ -3,10 +3,6 @@ structure MipsFrame : FRAME = struct
 structure T = Tree
 
 val wordSize = 8
-val FP = Temp.newtemp()
-val RV = Temp.newtemp() (* return register *)
-val SP = Temp.newtemp()
-val RA = Temp.newtemp()
 
 (* determines where the value will be stored -> register (temp) or memory (int) *)
 datatype access = InFrame of int | InReg of Temp.temp
@@ -23,11 +19,20 @@ type frame = { name: Temp.label,
 datatype frag = PROC of {body : Tree.stm, frame: frame}
                     | STRING of Temp.label * string
 
+
+(* registerse *)
+val FP = Temp.newtemp()
+val RV = Temp.newtemp() (* return register *)
+val SP = Temp.newtemp()
+val RA = Temp.newtemp()
+val ZERO = Temp.newtemp()   
+
 val special_regs = [
   (FP, "$fp"),
   (RV, "$v0"),
   (SP, "$sp"),
-  (RA, "$ra")
+  (RA, "$ra"),
+  (ZERO, "$r0")
 ]                
 
 fun entryenv ((id, data), env) =
@@ -38,13 +43,20 @@ fun make_many_temps times =
   else Temp.newtemp() :: (make_many_temps (times - 1))    
 
 val args_reg_list = make_many_temps 4
+val callee_saves = make_many_temps 8
 
-val final_regs = special_regs @ (ListPair.zip (args_reg_list, ["$a0", "$a1", "$a2", "$a3"]))
+val final_regs = special_regs @ 
+  (ListPair.zip (args_reg_list, ["$a0", "$a1", "$a2", "$a3"])) @
+  (ListPair.zip (callee_saves, ["$s0", "$s1", "$s2", "$s3", "$s4", "$s5", "$s6", "$s7"]))
 
 val calldefs = args_reg_list @ [RV, RA]
 
 val tempMap = List.foldl entryenv Temp.Table.empty final_regs 
 
+fun get_reg_names reg_temp = 
+  case Temp.Table.look (tempMap, reg_temp) of
+    SOME res => res
+    | NONE => Temp.makestring reg_temp
 
 fun assignMem index = InFrame  (index * wordSize)(* TODO: Change later *)
 
@@ -116,5 +128,18 @@ fun externalCall (name: string) (args : Tree.exp list) =
   T.CALL (T.NAME (Temp.namedlabel name), args)
 
 fun procEntryExit1 (c_frame, t_stm) = t_stm (* implement view shift later *)
+
+fun procEntryExit2 (c_frame, body) = 
+  body @
+  [Assem.OPER { assem="",
+    src=[ZERO, RA, SP] @ callee_saves,
+    dst=[], jump=SOME[] }]
+
+fun procEntryExit3 ({name, formals, locals, totalFormals, totalLocals}, body) = 
+  {
+    prolog = "PROCEDURE " ^ Symbol.name name ^ "\n",
+    body = body,
+    epilog = "END " ^ Symbol.name name ^ "\n"
+  }  
 
 end

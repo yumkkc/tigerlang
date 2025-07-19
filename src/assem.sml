@@ -47,7 +47,7 @@ structure Assem : ASSEM = struct
       in fn OPER{assem,dst,src,jump=NONE} => speak(assem,dst,src,nil)
           | OPER{assem,dst,src,jump=SOME j} => speak(assem,dst,src,j)
 	  | LABEL{assem,...} => assem
-	  | MOVE{assem,dst,src} => speak(assem,[dst],[src],nil)
+	  | MOVE{assem,dst,src} =>  speak(assem,[dst],[src],nil)
      end
 
 end

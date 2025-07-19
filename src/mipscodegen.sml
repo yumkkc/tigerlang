@@ -1,6 +1,7 @@
 structure MipsCodeGen : CODEGEN = struct
 
 structure Frame = MipsFrame
+
 structure A = Assem
 structure T = Tree
 
@@ -14,6 +15,7 @@ fun codegen frame (stm: Tree.stm) : Assem.instr list =
                 emit (A.OPER{assem = "sw `s1 " ^ Int.toString oft  ^ "( `s0 )\n",
                             src=[munchExp e1, munchExp e2],
                             dst=[], 
+                            
                             jump=NONE})
             | munchStm (T.MOVE (T.MEM (T.BINOP (T.PLUS, e1, e2)), e3)) = 
                 emit(A.OPER {assem = "sw `s2 `s0(`s1)\n",
@@ -24,17 +26,23 @@ fun codegen frame (stm: Tree.stm) : Assem.instr list =
                             src = [munchExp e1, munchExp e2],
                             dst=[], jump=NONE
                             }) 
-            | munchStm (T.MOVE (T.TEMP t, T.CALL (f, args))) = 
-                emit (A.OPER {
-                    assem = "jal `s0\n move `d0 $v0 \n",
-                    src = (munchExp f) :: (munchArgs 0 args),
-                    dst=(t :: Translate.calldefs), jump=NONE
-                })
-            | munchStm (T.MOVE (e1, e2)) = 
+
+            | munchStm (T.MOVE (T.TEMP t, T.CALL (T.NAME lab, args))) = (
+                    emit (A.OPER {
+                        assem = "jal `j0\n",
+                        src = munchArgs 0 args,
+                        dst=Translate.calldefs, jump=SOME [lab]
+                    });
+                    emit (A.MOVE {
+                        assem = "move `d0 `s0 \n",
+                        src = Frame.RV, dst=t
+                    })
+            )
+            | munchStm (T.MOVE (d, s)) = 
                 emit(A.MOVE {
-                    assem="move `d0 `d1\n", 
-                    src=munchExp e1,
-                    dst=munchExp e2
+                    assem="move `d0 `s0\n", 
+                    src=munchExp s,
+                    dst=munchExp d
                 })
             | munchStm (T.JUMP ((T.NAME _), lablist)) = 
                 emit (A.OPER {
@@ -95,15 +103,17 @@ fun codegen frame (stm: Tree.stm) : Assem.instr list =
         and
 
         munchExp (T.TEMP t) = 
+        (
             if t = Frame.FP then
                 result(fn r => 
                     emit(A.OPER{
-                        assem="addiu `d0, `s0, " ^ Symbol.name (Frame.name frame) ^ "_framesize",
+                        assem="addiu `d0, `s0, " ^ Symbol.name (Frame.name frame) ^ "_framesize\n",
                         src=[Frame.SP], dst=[r], jump=NONE
                     })
                 )
             else 
                 t
+        )
         | munchExp (T.MEM(T.BINOP(T.PLUS, e1, T.CONST i))) = 
             result(fn r => emit (
                 A.OPER {
@@ -162,6 +172,13 @@ fun codegen frame (stm: Tree.stm) : Assem.instr list =
                     assem = "addi `d0 $r0 " ^ Int.toString i ^ "\n",
                     src=[], dst=[r], jump=NONE
                 }))
+        | munchExp (T.NAME lab) = 
+            result (fn r => emit (
+                A.OPER {
+                    assem = "la `d0, " ^ Symbol.name lab ^ "\n",
+                    src = [], dst = [r], jump=NONE
+                }
+            ))
         | munchExp _ = ErrorMsg.impossible "Not matching in code generation"
 
         and

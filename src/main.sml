@@ -17,11 +17,18 @@ fun main filename =
                                                                         print_blocks blocks)
         |  print_blocks [] = print("finish priting blocks\n\n")
 
+        fun codegen_trace [] _ = print("finish\n")
+        | codegen_trace (stm::stms) frag_frame = 
+            let val res = MipsCodeGen.codegen frag_frame stm
+            in List.app (fn instr => print (Assem.format Frame.get_reg_names instr)) (List.rev res); 
+            codegen_trace stms frag_frame
+            end
+
         fun print_frag [] = ()
             | print_frag (frag::frags) =
                 let
                     val Frame.PROC o_frag = frag
-                    val frag_main = (#body o_frag)
+                    val {body=frag_main, frame=frag_frame} = o_frag
                     val _ = Printtree.printtree (TextIO.stdOut, (#body o_frag))                    
                     val linearized = Canon.linearize frag_main
                     val _ = print "--------+++---------------\n\n"
@@ -31,10 +38,10 @@ fun main filename =
                     val _ = print "Block priting !!!!\n"    
                     val _ = print_blocks blocks'
                     val traces = Canon.traceSchedule blocks
-
+                    val _ = print "traces printing\n\n"
+                    val _ = print_linear traces
+                    val _ = codegen_trace traces frag_frame
                 in                    
-                    print "traces printing\n\n";
-                    print_linear traces;
                     print_frag frags
                 end
         in
