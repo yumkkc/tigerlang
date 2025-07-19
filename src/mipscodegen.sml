@@ -24,6 +24,18 @@ fun codegen frame (stm: Tree.stm) : Assem.instr list =
                             src = [munchExp e1, munchExp e2],
                             dst=[], jump=NONE
                             }) 
+            | munchStm (T.MOVE (T.TEMP t, T.CALL (f, args))) = 
+                emit (A.OPER {
+                    assem = "jal `s0\n move `d0 $v0 \n",
+                    src = (munchExp f) :: (munchArgs 0 args),
+                    dst=(t :: Translate.calldefs), jump=NONE
+                })
+            | munchStm (T.MOVE (e1, e2)) = 
+                emit(A.MOVE {
+                    assem="move `d0 `d1\n", 
+                    src=munchExp e1,
+                    dst=munchExp e2
+                })
             | munchStm (T.JUMP ((T.NAME _), lablist)) = 
                 emit (A.OPER {
                     assem = "j `j0\n", src = [], dst = [],
@@ -78,12 +90,79 @@ fun codegen frame (stm: Tree.stm) : Assem.instr list =
 
                 })
             | munchStm (T.EXP exp) = let val _ = munchExp exp in () end
-            | munchStm _ = ()
+            | munchStm _ = ErrorMsg.impossible "Not matching in code generation"
 
         and
 
-        munchExp (T.TEMP t) = t
-        | munchExp _ = result(fn x => x)
+        munchExp (T.TEMP t) = 
+            if t = Frame.FP then
+                result(fn r => 
+                    emit(A.OPER{
+                        assem="addiu `d0, `s0, " ^ Symbol.name (Frame.name frame) ^ "_framesize",
+                        src=[Frame.SP], dst=[r], jump=NONE
+                    })
+                )
+            else 
+                t
+        | munchExp (T.MEM(T.BINOP(T.PLUS, e1, T.CONST i))) = 
+            result(fn r => emit (
+                A.OPER {
+                    assem="lw `d0 " ^ Int.toString i ^ "(`s1)\n",
+                    src=[munchExp e1], dst=[r], jump=NONE
+                }))
+        | munchExp (T.MEM(T.BINOP(T.PLUS, T.CONST i, e1))) = 
+            result(fn r => emit (
+                A.OPER {
+                    assem="lw `d0 " ^ Int.toString i ^ "(`s1)\n",
+                    src=[munchExp e1], dst=[r], jump=NONE
+                }))
+        | munchExp (T.MEM(T.CONST i)) = 
+            result(fn r => emit (
+                A.OPER {
+                    assem = "lw `d0 " ^ Int.toString i ^ "($r0)\n",
+                    src=[], dst=[r], jump=NONE
+                }))
+        | munchExp (T.MEM e1) = 
+            result(fn r => emit (
+                A.OPER {
+                    assem="lw `d0 `s0\n",
+                    src=[munchExp e1], dst=[r], jump=NONE
+                }))
+        | munchExp (T.BINOP (T.PLUS, e1, e2)) = 
+            result (fn r => emit (
+                A.OPER {
+                    assem = "add `d0 `s0 `s1\n",
+                    src=[munchExp e1, munchExp e2], dst=[r], jump=NONE
+                }
+            ))
+        | munchExp (T.BINOP (T.MINUS, e1, e2)) = 
+            result (fn r => emit (
+                A.OPER {
+                    assem = "sub `d0 `s0 `s1\n",
+                    src=[munchExp e1, munchExp e2], dst=[r], jump=NONE
+                }
+            ))
+        | munchExp (T.BINOP (T.MUL, e1, e2)) = 
+            result (fn r => emit (
+                A.OPER {
+                    assem = "sll `d0 `s0 `s1\n",
+                    src=[munchExp e1, munchExp e2], dst=[r], jump=NONE
+                }
+            ))
+        | munchExp (T.BINOP (T.DIV, e1, e2)) = 
+            result (fn r => emit (
+                A.OPER {
+                    assem = "srl `d0 `s0 `s1\n",
+                    src=[munchExp e1, munchExp e2], dst=[r], jump=NONE
+                }
+            ))
+        | munchExp (T.CONST i) = 
+            result (fn r => emit (
+                A.OPER {
+                    assem = "addi `d0 $r0 " ^ Int.toString i ^ "\n",
+                    src=[], dst=[r], jump=NONE
+                }))
+        | munchExp _ = ErrorMsg.impossible "Not matching in code generation"
 
         and
         munchArgs index args = 

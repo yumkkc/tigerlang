@@ -43,6 +43,7 @@ sig
     (* for assem *)
     val getArgReg: unit -> Temp.temp list
     val SP: Temp.temp
+    val FP: Temp.temp
     val wordsize : int
     val calldefs : Temp.temp list
 

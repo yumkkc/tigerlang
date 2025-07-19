@@ -43,6 +43,8 @@ val final_regs = special_regs @ (ListPair.zip (args_reg_list, ["$a0", "$a1", "$a
 
 val calldefs = args_reg_list @ [RV, RA]
 
+val tempMap = List.foldl entryenv Temp.Table.empty final_regs 
+
 
 fun assignMem index = InFrame  (index * wordSize)(* TODO: Change later *)
 
